@@ -60,6 +60,24 @@ Jeżu klątw, spłódź Finom część gry hańb!
 11 passed, 0 failed tests
 ```
 
+## How small is it?
+
+Not small enough.
+
+```
+$ for i in src/*; do gcc -c $i -O1; done
+$ du -bhc *.o | grep total
+87K total
+
+$ for i in src/*; do gcc -c $i -O3; done
+$ du -bhc *.o | grep total
+63K total
+
+$ for i in src/*; do gcc -c $i -Os; done
+$ du -bhc *.o | grep total
+55K total
+```
+
 ## Related
 
   * [iconv](https://www.gnu.org/software/libiconv/)
