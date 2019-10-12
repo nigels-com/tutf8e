@@ -11,6 +11,13 @@ int encode_iso_8859_1_utf8(char *dest, size_t size, const char *src)
       *o++ = *i;
       continue;
     }
+    if (*i<128) return -1;
+    if (*i==128) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x0080>>6);
+      *o++ = 0x80 | (0x0080&0x3f);
+      continue;
+    }
     if (*i<129) return -1;
     /* if (*i<=255) */ {
       if (end-o < 2) return -2;
@@ -20,5 +27,7 @@ int encode_iso_8859_1_utf8(char *dest, size_t size, const char *src)
     }
     return -1;
   }
+  if (end-o < 1) return -2;
+  *o++ = 0;
   return 0;
 }

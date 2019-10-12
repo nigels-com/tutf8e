@@ -28,6 +28,15 @@
   * [iso-8859-14](https://en.wikipedia.org/wiki/ISO/IEC_8859-14) Latin-8 Celtic
   * [iso-8859-15](https://en.wikipedia.org/wiki/ISO/IEC_8859-15) Latin-9 Western European 
   * [iso-8859-16](https://en.wikipedia.org/wiki/ISO/IEC_8859-16) Latin-10 South-Eastern European
+  * [windows-1250](https://en.wikipedia.org/wiki/Windows-1250) Central European and Eastern European
+  * [windows-1251](https://en.wikipedia.org/wiki/Windows-1251) Cyrillic
+  * [windows-1252](https://en.wikipedia.org/wiki/Windows-1252) English
+  * [windows-1253](https://en.wikipedia.org/wiki/Windows-1253) Greek
+  * [windows-1254](https://en.wikipedia.org/wiki/Windows-1254) Turkish
+  * [windows-1255](https://en.wikipedia.org/wiki/Windows-1255) Hebrew
+  * [windows-1256](https://en.wikipedia.org/wiki/Windows-1256) Arabic
+  * [windows-1257](https://en.wikipedia.org/wiki/Windows-1257) Baltic
+  * [windows-1258](https://en.wikipedia.org/wiki/Windows-1258) Vietnamese
 
 ## Related
 

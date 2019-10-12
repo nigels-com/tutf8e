@@ -1,7 +1,7 @@
 #include <stddef.h>  /* size_t */
 #include <stdint.h>  /* uint16_t */
 
-int encode_windows_1257_utf8(char *dest, size_t size, const char *src)
+int encode_windows_1250_utf8(char *dest, size_t size, const char *src)
 {
   unsigned char *o = (unsigned char *) dest;
   unsigned char *end = dest + size;
@@ -60,6 +60,13 @@ int encode_windows_1257_utf8(char *dest, size_t size, const char *src)
       *o++ = 0x80 | (0x2030&0x3f);
       continue;
     }
+    if (*i<138) return -1;
+    if (*i==138) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x0160>>6);
+      *o++ = 0x80 | (0x0160&0x3f);
+      continue;
+    }
     if (*i<139) return -1;
     if (*i==139) {
       if (end-o < 3) return -2;
@@ -68,25 +75,32 @@ int encode_windows_1257_utf8(char *dest, size_t size, const char *src)
       *o++ = 0x80 | (0x2039&0x3f);
       continue;
     }
+    if (*i<140) return -1;
+    if (*i==140) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x015a>>6);
+      *o++ = 0x80 | (0x015a&0x3f);
+      continue;
+    }
     if (*i<141) return -1;
     if (*i==141) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x00a8>>6);
-      *o++ = 0x80 | (0x00a8&0x3f);
+      *o++ = 0xc0 | (0x0164>>6);
+      *o++ = 0x80 | (0x0164&0x3f);
       continue;
     }
     if (*i<142) return -1;
     if (*i==142) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x02c7>>6);
-      *o++ = 0x80 | (0x02c7&0x3f);
+      *o++ = 0xc0 | (0x017d>>6);
+      *o++ = 0x80 | (0x017d&0x3f);
       continue;
     }
     if (*i<143) return -1;
     if (*i==143) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x00b8>>6);
-      *o++ = 0x80 | (0x00b8&0x3f);
+      *o++ = 0xc0 | (0x0179>>6);
+      *o++ = 0x80 | (0x0179&0x3f);
       continue;
     }
     if (*i<145) return -1;
@@ -132,6 +146,13 @@ int encode_windows_1257_utf8(char *dest, size_t size, const char *src)
       *o++ = 0x80 | (0x2122&0x3f);
       continue;
     }
+    if (*i<154) return -1;
+    if (*i==154) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x0161>>6);
+      *o++ = 0x80 | (0x0161&0x3f);
+      continue;
+    }
     if (*i<155) return -1;
     if (*i==155) {
       if (end-o < 3) return -2;
@@ -140,18 +161,32 @@ int encode_windows_1257_utf8(char *dest, size_t size, const char *src)
       *o++ = 0x80 | (0x203a&0x3f);
       continue;
     }
+    if (*i<156) return -1;
+    if (*i==156) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x015b>>6);
+      *o++ = 0x80 | (0x015b&0x3f);
+      continue;
+    }
     if (*i<157) return -1;
     if (*i==157) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x00af>>6);
-      *o++ = 0x80 | (0x00af&0x3f);
+      *o++ = 0xc0 | (0x0165>>6);
+      *o++ = 0x80 | (0x0165&0x3f);
       continue;
     }
     if (*i<158) return -1;
     if (*i==158) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x02db>>6);
-      *o++ = 0x80 | (0x02db&0x3f);
+      *o++ = 0xc0 | (0x017e>>6);
+      *o++ = 0x80 | (0x017e&0x3f);
+      continue;
+    }
+    if (*i<159) return -1;
+    if (*i==159) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x017a>>6);
+      *o++ = 0x80 | (0x017a&0x3f);
       continue;
     }
     if (*i<160) return -1;
@@ -161,39 +196,53 @@ int encode_windows_1257_utf8(char *dest, size_t size, const char *src)
       *o++ = 0x80 | (0x00a0&0x3f);
       continue;
     }
-    if (*i<162) return -1;
-    if (*i<=164) {
+    if (*i<161) return -1;
+    if (*i==161) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (*i>>6);
-      *o++ = 0x80 | (*i&0x3f);
+      *o++ = 0xc0 | (0x02c7>>6);
+      *o++ = 0x80 | (0x02c7&0x3f);
+      continue;
+    }
+    if (*i<162) return -1;
+    if (*i==162) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x02d8>>6);
+      *o++ = 0x80 | (0x02d8&0x3f);
+      continue;
+    }
+    if (*i<163) return -1;
+    if (*i==163) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x0141>>6);
+      *o++ = 0x80 | (0x0141&0x3f);
+      continue;
+    }
+    if (*i<164) return -1;
+    if (*i==164) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x00a4>>6);
+      *o++ = 0x80 | (0x00a4&0x3f);
+      continue;
+    }
+    if (*i<165) return -1;
+    if (*i==165) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x0104>>6);
+      *o++ = 0x80 | (0x0104&0x3f);
       continue;
     }
     if (*i<166) return -1;
-    if (*i<=167) {
+    if (*i<=169) {
       if (end-o < 2) return -2;
       *o++ = 0xc0 | (*i>>6);
       *o++ = 0x80 | (*i&0x3f);
-      continue;
-    }
-    if (*i<168) return -1;
-    if (*i==168) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x00d8>>6);
-      *o++ = 0x80 | (0x00d8&0x3f);
-      continue;
-    }
-    if (*i<169) return -1;
-    if (*i==169) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x00a9>>6);
-      *o++ = 0x80 | (0x00a9&0x3f);
       continue;
     }
     if (*i<170) return -1;
     if (*i==170) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0156>>6);
-      *o++ = 0x80 | (0x0156&0x3f);
+      *o++ = 0xc0 | (0x015e>>6);
+      *o++ = 0x80 | (0x015e&0x3f);
       continue;
     }
     if (*i<171) return -1;
@@ -206,99 +255,134 @@ int encode_windows_1257_utf8(char *dest, size_t size, const char *src)
     if (*i<175) return -1;
     if (*i==175) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x00c6>>6);
-      *o++ = 0x80 | (0x00c6&0x3f);
+      *o++ = 0xc0 | (0x017b>>6);
+      *o++ = 0x80 | (0x017b&0x3f);
       continue;
     }
     if (*i<176) return -1;
-    if (*i<=183) {
+    if (*i<=177) {
       if (end-o < 2) return -2;
       *o++ = 0xc0 | (*i>>6);
       *o++ = 0x80 | (*i&0x3f);
       continue;
     }
-    if (*i<184) return -1;
-    if (*i==184) {
+    if (*i<178) return -1;
+    if (*i==178) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x00f8>>6);
-      *o++ = 0x80 | (0x00f8&0x3f);
+      *o++ = 0xc0 | (0x02db>>6);
+      *o++ = 0x80 | (0x02db&0x3f);
+      continue;
+    }
+    if (*i<179) return -1;
+    if (*i==179) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x0142>>6);
+      *o++ = 0x80 | (0x0142&0x3f);
+      continue;
+    }
+    if (*i<180) return -1;
+    if (*i<=184) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (*i>>6);
+      *o++ = 0x80 | (*i&0x3f);
       continue;
     }
     if (*i<185) return -1;
     if (*i==185) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x00b9>>6);
-      *o++ = 0x80 | (0x00b9&0x3f);
+      *o++ = 0xc0 | (0x0105>>6);
+      *o++ = 0x80 | (0x0105&0x3f);
       continue;
     }
     if (*i<186) return -1;
     if (*i==186) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0157>>6);
-      *o++ = 0x80 | (0x0157&0x3f);
+      *o++ = 0xc0 | (0x015f>>6);
+      *o++ = 0x80 | (0x015f&0x3f);
       continue;
     }
     if (*i<187) return -1;
-    if (*i<=190) {
+    if (*i==187) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (*i>>6);
-      *o++ = 0x80 | (*i&0x3f);
+      *o++ = 0xc0 | (0x00bb>>6);
+      *o++ = 0x80 | (0x00bb&0x3f);
+      continue;
+    }
+    if (*i<188) return -1;
+    if (*i==188) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x013d>>6);
+      *o++ = 0x80 | (0x013d&0x3f);
+      continue;
+    }
+    if (*i<189) return -1;
+    if (*i==189) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x02dd>>6);
+      *o++ = 0x80 | (0x02dd&0x3f);
+      continue;
+    }
+    if (*i<190) return -1;
+    if (*i==190) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x013e>>6);
+      *o++ = 0x80 | (0x013e&0x3f);
       continue;
     }
     if (*i<191) return -1;
     if (*i==191) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x00e6>>6);
-      *o++ = 0x80 | (0x00e6&0x3f);
+      *o++ = 0xc0 | (0x017c>>6);
+      *o++ = 0x80 | (0x017c&0x3f);
       continue;
     }
     if (*i<192) return -1;
     if (*i==192) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0104>>6);
-      *o++ = 0x80 | (0x0104&0x3f);
+      *o++ = 0xc0 | (0x0154>>6);
+      *o++ = 0x80 | (0x0154&0x3f);
       continue;
     }
     if (*i<193) return -1;
-    if (*i==193) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x012e>>6);
-      *o++ = 0x80 | (0x012e&0x3f);
-      continue;
-    }
-    if (*i<194) return -1;
-    if (*i==194) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0100>>6);
-      *o++ = 0x80 | (0x0100&0x3f);
-      continue;
-    }
-    if (*i<195) return -1;
-    if (*i==195) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0106>>6);
-      *o++ = 0x80 | (0x0106&0x3f);
-      continue;
-    }
-    if (*i<196) return -1;
-    if (*i<=197) {
+    if (*i<=194) {
       if (end-o < 2) return -2;
       *o++ = 0xc0 | (*i>>6);
       *o++ = 0x80 | (*i&0x3f);
       continue;
     }
+    if (*i<195) return -1;
+    if (*i==195) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x0102>>6);
+      *o++ = 0x80 | (0x0102&0x3f);
+      continue;
+    }
+    if (*i<196) return -1;
+    if (*i==196) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x00c4>>6);
+      *o++ = 0x80 | (0x00c4&0x3f);
+      continue;
+    }
+    if (*i<197) return -1;
+    if (*i==197) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x0139>>6);
+      *o++ = 0x80 | (0x0139&0x3f);
+      continue;
+    }
     if (*i<198) return -1;
     if (*i==198) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0118>>6);
-      *o++ = 0x80 | (0x0118&0x3f);
+      *o++ = 0xc0 | (0x0106>>6);
+      *o++ = 0x80 | (0x0106&0x3f);
       continue;
     }
     if (*i<199) return -1;
     if (*i==199) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0112>>6);
-      *o++ = 0x80 | (0x0112&0x3f);
+      *o++ = 0xc0 | (0x00c7>>6);
+      *o++ = 0x80 | (0x00c7&0x3f);
       continue;
     }
     if (*i<200) return -1;
@@ -318,50 +402,43 @@ int encode_windows_1257_utf8(char *dest, size_t size, const char *src)
     if (*i<202) return -1;
     if (*i==202) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0179>>6);
-      *o++ = 0x80 | (0x0179&0x3f);
+      *o++ = 0xc0 | (0x0118>>6);
+      *o++ = 0x80 | (0x0118&0x3f);
       continue;
     }
     if (*i<203) return -1;
     if (*i==203) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0116>>6);
-      *o++ = 0x80 | (0x0116&0x3f);
+      *o++ = 0xc0 | (0x00cb>>6);
+      *o++ = 0x80 | (0x00cb&0x3f);
       continue;
     }
     if (*i<204) return -1;
     if (*i==204) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0122>>6);
-      *o++ = 0x80 | (0x0122&0x3f);
+      *o++ = 0xc0 | (0x011a>>6);
+      *o++ = 0x80 | (0x011a&0x3f);
       continue;
     }
     if (*i<205) return -1;
-    if (*i==205) {
+    if (*i<=206) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0136>>6);
-      *o++ = 0x80 | (0x0136&0x3f);
-      continue;
-    }
-    if (*i<206) return -1;
-    if (*i==206) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x012a>>6);
-      *o++ = 0x80 | (0x012a&0x3f);
+      *o++ = 0xc0 | (*i>>6);
+      *o++ = 0x80 | (*i&0x3f);
       continue;
     }
     if (*i<207) return -1;
     if (*i==207) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x013b>>6);
-      *o++ = 0x80 | (0x013b&0x3f);
+      *o++ = 0xc0 | (0x010e>>6);
+      *o++ = 0x80 | (0x010e&0x3f);
       continue;
     }
     if (*i<208) return -1;
     if (*i==208) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0160>>6);
-      *o++ = 0x80 | (0x0160&0x3f);
+      *o++ = 0xc0 | (0x0110>>6);
+      *o++ = 0x80 | (0x0110&0x3f);
       continue;
     }
     if (*i<209) return -1;
@@ -374,25 +451,25 @@ int encode_windows_1257_utf8(char *dest, size_t size, const char *src)
     if (*i<210) return -1;
     if (*i==210) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0145>>6);
-      *o++ = 0x80 | (0x0145&0x3f);
+      *o++ = 0xc0 | (0x0147>>6);
+      *o++ = 0x80 | (0x0147&0x3f);
       continue;
     }
     if (*i<211) return -1;
-    if (*i==211) {
+    if (*i<=212) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x00d3>>6);
-      *o++ = 0x80 | (0x00d3&0x3f);
-      continue;
-    }
-    if (*i<212) return -1;
-    if (*i==212) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x014c>>6);
-      *o++ = 0x80 | (0x014c&0x3f);
+      *o++ = 0xc0 | (*i>>6);
+      *o++ = 0x80 | (*i&0x3f);
       continue;
     }
     if (*i<213) return -1;
+    if (*i==213) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x0150>>6);
+      *o++ = 0x80 | (0x0150&0x3f);
+      continue;
+    }
+    if (*i<214) return -1;
     if (*i<=215) {
       if (end-o < 2) return -2;
       *o++ = 0xc0 | (*i>>6);
@@ -402,50 +479,43 @@ int encode_windows_1257_utf8(char *dest, size_t size, const char *src)
     if (*i<216) return -1;
     if (*i==216) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0172>>6);
-      *o++ = 0x80 | (0x0172&0x3f);
+      *o++ = 0xc0 | (0x0158>>6);
+      *o++ = 0x80 | (0x0158&0x3f);
       continue;
     }
     if (*i<217) return -1;
     if (*i==217) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0141>>6);
-      *o++ = 0x80 | (0x0141&0x3f);
+      *o++ = 0xc0 | (0x016e>>6);
+      *o++ = 0x80 | (0x016e&0x3f);
       continue;
     }
     if (*i<218) return -1;
     if (*i==218) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x015a>>6);
-      *o++ = 0x80 | (0x015a&0x3f);
+      *o++ = 0xc0 | (0x00da>>6);
+      *o++ = 0x80 | (0x00da&0x3f);
       continue;
     }
     if (*i<219) return -1;
     if (*i==219) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x016a>>6);
-      *o++ = 0x80 | (0x016a&0x3f);
+      *o++ = 0xc0 | (0x0170>>6);
+      *o++ = 0x80 | (0x0170&0x3f);
       continue;
     }
     if (*i<220) return -1;
-    if (*i==220) {
+    if (*i<=221) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x00dc>>6);
-      *o++ = 0x80 | (0x00dc&0x3f);
-      continue;
-    }
-    if (*i<221) return -1;
-    if (*i==221) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x017b>>6);
-      *o++ = 0x80 | (0x017b&0x3f);
+      *o++ = 0xc0 | (*i>>6);
+      *o++ = 0x80 | (*i&0x3f);
       continue;
     }
     if (*i<222) return -1;
     if (*i==222) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x017d>>6);
-      *o++ = 0x80 | (0x017d&0x3f);
+      *o++ = 0xc0 | (0x0162>>6);
+      *o++ = 0x80 | (0x0162&0x3f);
       continue;
     }
     if (*i<223) return -1;
@@ -458,50 +528,50 @@ int encode_windows_1257_utf8(char *dest, size_t size, const char *src)
     if (*i<224) return -1;
     if (*i==224) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0105>>6);
-      *o++ = 0x80 | (0x0105&0x3f);
+      *o++ = 0xc0 | (0x0155>>6);
+      *o++ = 0x80 | (0x0155&0x3f);
       continue;
     }
     if (*i<225) return -1;
-    if (*i==225) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x012f>>6);
-      *o++ = 0x80 | (0x012f&0x3f);
-      continue;
-    }
-    if (*i<226) return -1;
-    if (*i==226) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0101>>6);
-      *o++ = 0x80 | (0x0101&0x3f);
-      continue;
-    }
-    if (*i<227) return -1;
-    if (*i==227) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0107>>6);
-      *o++ = 0x80 | (0x0107&0x3f);
-      continue;
-    }
-    if (*i<228) return -1;
-    if (*i<=229) {
+    if (*i<=226) {
       if (end-o < 2) return -2;
       *o++ = 0xc0 | (*i>>6);
       *o++ = 0x80 | (*i&0x3f);
       continue;
     }
+    if (*i<227) return -1;
+    if (*i==227) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x0103>>6);
+      *o++ = 0x80 | (0x0103&0x3f);
+      continue;
+    }
+    if (*i<228) return -1;
+    if (*i==228) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x00e4>>6);
+      *o++ = 0x80 | (0x00e4&0x3f);
+      continue;
+    }
+    if (*i<229) return -1;
+    if (*i==229) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x013a>>6);
+      *o++ = 0x80 | (0x013a&0x3f);
+      continue;
+    }
     if (*i<230) return -1;
     if (*i==230) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0119>>6);
-      *o++ = 0x80 | (0x0119&0x3f);
+      *o++ = 0xc0 | (0x0107>>6);
+      *o++ = 0x80 | (0x0107&0x3f);
       continue;
     }
     if (*i<231) return -1;
     if (*i==231) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0113>>6);
-      *o++ = 0x80 | (0x0113&0x3f);
+      *o++ = 0xc0 | (0x00e7>>6);
+      *o++ = 0x80 | (0x00e7&0x3f);
       continue;
     }
     if (*i<232) return -1;
@@ -521,50 +591,43 @@ int encode_windows_1257_utf8(char *dest, size_t size, const char *src)
     if (*i<234) return -1;
     if (*i==234) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x017a>>6);
-      *o++ = 0x80 | (0x017a&0x3f);
+      *o++ = 0xc0 | (0x0119>>6);
+      *o++ = 0x80 | (0x0119&0x3f);
       continue;
     }
     if (*i<235) return -1;
     if (*i==235) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0117>>6);
-      *o++ = 0x80 | (0x0117&0x3f);
+      *o++ = 0xc0 | (0x00eb>>6);
+      *o++ = 0x80 | (0x00eb&0x3f);
       continue;
     }
     if (*i<236) return -1;
     if (*i==236) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0123>>6);
-      *o++ = 0x80 | (0x0123&0x3f);
+      *o++ = 0xc0 | (0x011b>>6);
+      *o++ = 0x80 | (0x011b&0x3f);
       continue;
     }
     if (*i<237) return -1;
-    if (*i==237) {
+    if (*i<=238) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0137>>6);
-      *o++ = 0x80 | (0x0137&0x3f);
-      continue;
-    }
-    if (*i<238) return -1;
-    if (*i==238) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x012b>>6);
-      *o++ = 0x80 | (0x012b&0x3f);
+      *o++ = 0xc0 | (*i>>6);
+      *o++ = 0x80 | (*i&0x3f);
       continue;
     }
     if (*i<239) return -1;
     if (*i==239) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x013c>>6);
-      *o++ = 0x80 | (0x013c&0x3f);
+      *o++ = 0xc0 | (0x010f>>6);
+      *o++ = 0x80 | (0x010f&0x3f);
       continue;
     }
     if (*i<240) return -1;
     if (*i==240) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0161>>6);
-      *o++ = 0x80 | (0x0161&0x3f);
+      *o++ = 0xc0 | (0x0111>>6);
+      *o++ = 0x80 | (0x0111&0x3f);
       continue;
     }
     if (*i<241) return -1;
@@ -577,25 +640,25 @@ int encode_windows_1257_utf8(char *dest, size_t size, const char *src)
     if (*i<242) return -1;
     if (*i==242) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0146>>6);
-      *o++ = 0x80 | (0x0146&0x3f);
+      *o++ = 0xc0 | (0x0148>>6);
+      *o++ = 0x80 | (0x0148&0x3f);
       continue;
     }
     if (*i<243) return -1;
-    if (*i==243) {
+    if (*i<=244) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x00f3>>6);
-      *o++ = 0x80 | (0x00f3&0x3f);
-      continue;
-    }
-    if (*i<244) return -1;
-    if (*i==244) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x014d>>6);
-      *o++ = 0x80 | (0x014d&0x3f);
+      *o++ = 0xc0 | (*i>>6);
+      *o++ = 0x80 | (*i&0x3f);
       continue;
     }
     if (*i<245) return -1;
+    if (*i==245) {
+      if (end-o < 2) return -2;
+      *o++ = 0xc0 | (0x0151>>6);
+      *o++ = 0x80 | (0x0151&0x3f);
+      continue;
+    }
+    if (*i<246) return -1;
     if (*i<=247) {
       if (end-o < 2) return -2;
       *o++ = 0xc0 | (*i>>6);
@@ -605,50 +668,43 @@ int encode_windows_1257_utf8(char *dest, size_t size, const char *src)
     if (*i<248) return -1;
     if (*i==248) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0173>>6);
-      *o++ = 0x80 | (0x0173&0x3f);
+      *o++ = 0xc0 | (0x0159>>6);
+      *o++ = 0x80 | (0x0159&0x3f);
       continue;
     }
     if (*i<249) return -1;
     if (*i==249) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0142>>6);
-      *o++ = 0x80 | (0x0142&0x3f);
+      *o++ = 0xc0 | (0x016f>>6);
+      *o++ = 0x80 | (0x016f&0x3f);
       continue;
     }
     if (*i<250) return -1;
     if (*i==250) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x015b>>6);
-      *o++ = 0x80 | (0x015b&0x3f);
+      *o++ = 0xc0 | (0x00fa>>6);
+      *o++ = 0x80 | (0x00fa&0x3f);
       continue;
     }
     if (*i<251) return -1;
     if (*i==251) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x016b>>6);
-      *o++ = 0x80 | (0x016b&0x3f);
+      *o++ = 0xc0 | (0x0171>>6);
+      *o++ = 0x80 | (0x0171&0x3f);
       continue;
     }
     if (*i<252) return -1;
-    if (*i==252) {
+    if (*i<=253) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x00fc>>6);
-      *o++ = 0x80 | (0x00fc&0x3f);
-      continue;
-    }
-    if (*i<253) return -1;
-    if (*i==253) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x017c>>6);
-      *o++ = 0x80 | (0x017c&0x3f);
+      *o++ = 0xc0 | (*i>>6);
+      *o++ = 0x80 | (*i&0x3f);
       continue;
     }
     if (*i<254) return -1;
     if (*i==254) {
       if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x017e>>6);
-      *o++ = 0x80 | (0x017e&0x3f);
+      *o++ = 0xc0 | (0x0163>>6);
+      *o++ = 0x80 | (0x0163&0x3f);
       continue;
     }
     if (*i<255) return -1;
