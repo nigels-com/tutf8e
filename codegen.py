@@ -49,6 +49,7 @@ with open('include/tutf8e.h', 'w') as include:
         src.write('  %s,\n'%(', '.join([ '0x%04x'%(i) for i in v[i:i+16]])))
       src.write('};\n')
 
+      src.write('\n')
       src.write('int encode_%s_utf8(char *dest, size_t size, const char *src)\n'%(name))
       src.write('{\n')
 
@@ -78,6 +79,8 @@ with open('include/tutf8e.h', 'w') as include:
       src.write('    }\n')
       src.write('    return -1;\n')
       src.write('  }\n')
+      src.write('  if (size<1) return -2;\n')
+      src.write('  *o++ = 0;\n')
       src.write('  return 0;\n')
       src.write('}\n')
 
