@@ -4,6 +4,8 @@
 #include <stddef.h>  /* size_t */
 #include <stdint.h>  /* uint16_t */
 
+extern int encode_utf8(char *dest, size_t size, const char *src, const uint16_t *table);
+
 extern int encode_iso_8859_1_utf8(char *dest, size_t size, const char *src);
 extern int encode_iso_8859_10_utf8(char *dest, size_t size, const char *src);
 extern int encode_iso_8859_11_utf8(char *dest, size_t size, const char *src);

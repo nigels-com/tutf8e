@@ -7,6 +7,43 @@ encodings = [
   'iso-8859-11', 'iso-8859-13', 'iso-8859-14', 'iso-8859-15', 'iso-8859-16'
   ]
 
+with open('src/tutf8e.c', 'w') as src:
+
+  src.write('#include <tutf8e.h>\n')
+  src.write('\n')
+  src.write('int encode_utf8(char *dest, size_t size, const char *src, const uint16_t *table)\n')
+  src.write('{\n')
+  src.write('  unsigned char *o = (unsigned char *) dest;\n')
+  src.write('  for (const unsigned char *i = (unsigned char *) src; *i; ++i) {\n')
+  src.write('    uint16_t c = table[*i];\n')
+  src.write('    if (c<0x80) {\n')
+  src.write('      if (size<1) return -2;\n')
+  src.write('      *o++ = c;\n')
+  src.write('      size--;\n')
+  src.write('      continue;\n')
+  src.write('    }\n')
+  src.write('    if (c<0x800) {\n')
+  src.write('      if (size<2) return -2;\n')
+  src.write('      *o++ = 0xc0 | (c>>6);\n')
+  src.write('      *o++ = 0x80 | (c&0x3f);\n')
+  src.write('      size -= 2;\n')
+  src.write('      continue;\n')
+  src.write('    }\n')
+  src.write('    if (c<0xffff) {\n')
+  src.write('      if (size<3) return -2;\n')
+  src.write('      *o++ = 0xe0 | (c>>12);\n')
+  src.write('      *o++ = 0x80 | ((c>>6)&0x3f);\n')
+  src.write('      *o++ = 0x80 | (c&0x3f);\n')
+  src.write('      size -= 3;\n')
+  src.write('      continue;\n')
+  src.write('    }\n')
+  src.write('    return -1;\n')
+  src.write('  }\n')
+  src.write('  if (size<1) return -2;\n')
+  src.write('  *o++ = 0;\n')
+  src.write('  return 0;\n')
+  src.write('}\n')
+
 with open('include/tutf8e.h', 'w') as include:
 
   include.write('#ifndef TUTF8E_H\n')
@@ -14,6 +51,8 @@ with open('include/tutf8e.h', 'w') as include:
   include.write('\n')
   include.write('#include <stddef.h>  /* size_t */\n')
   include.write('#include <stdint.h>  /* uint16_t */\n')
+  include.write('\n')
+  include.write('extern int encode_utf8(char *dest, size_t size, const char *src, const uint16_t *table);\n')
   include.write('\n')
 
   for e in sorted(encodings):
@@ -31,8 +70,7 @@ with open('include/tutf8e.h', 'w') as include:
 
       # Emit code
 
-      src.write('#include <stddef.h>  /* size_t */\n')
-      src.write('#include <stdint.h>  /* uint16_t */\n')
+      src.write('#include <tutf8e.h>\n')
       src.write('\n')
 
       v = []
@@ -52,36 +90,7 @@ with open('include/tutf8e.h', 'w') as include:
       src.write('\n')
       src.write('int encode_%s_utf8(char *dest, size_t size, const char *src)\n'%(name))
       src.write('{\n')
-
-      src.write('  unsigned char *o = (unsigned char *) dest;\n')
-      src.write('  for (const unsigned char *i = (unsigned char *) src; *i; ++i) {\n')
-      src.write('    uint16_t c = %s_utf8[*i];\n'%(name))
-      src.write('    if (c<0x80) {\n')
-      src.write('      if (size<1) return -2;\n')
-      src.write('      *o++ = c;\n')
-      src.write('      size--;\n')
-      src.write('      continue;\n')
-      src.write('    }\n')
-      src.write('    if (c<0x800) {\n')
-      src.write('      if (size<2) return -2;\n')
-      src.write('      *o++ = 0xc0 | (c>>6);\n')
-      src.write('      *o++ = 0x80 | (c&0x3f);\n')
-      src.write('      size -= 2;\n')
-      src.write('      continue;\n')
-      src.write('    }\n')
-      src.write('    if (c<0xffff) {\n')
-      src.write('      if (size<3) return -2;\n')
-      src.write('      *o++ = 0xe0 | (c>>12);\n')
-      src.write('      *o++ = 0x80 | ((c>>6)&0x3f);\n')
-      src.write('      *o++ = 0x80 | (c&0x3f);\n')
-      src.write('      size -= 3;\n')
-      src.write('      continue;\n')
-      src.write('    }\n')
-      src.write('    return -1;\n')
-      src.write('  }\n')
-      src.write('  if (size<1) return -2;\n')
-      src.write('  *o++ = 0;\n')
-      src.write('  return 0;\n')
+      src.write('  return encode_utf8(dest, size, src, %s_utf8);\n'%(name))
       src.write('}\n')
 
   include.write('\n')

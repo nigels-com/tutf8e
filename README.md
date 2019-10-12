@@ -62,20 +62,20 @@ Jeżu klątw, spłódź Finom część gry hańb!
 
 ## How small is it?
 
-Not small enough.
+512 bytes overhead per encoding.
 
 ```
 $ for i in src/*; do gcc -c $i -O1; done
 $ du -bhc *.o | grep total
-52K total
+32K total
 
 $ for i in src/*; do gcc -c $i -O3; done
 $ du -bhc *.o | grep total
-51K total
+32K total
 
 $ for i in src/*; do gcc -c $i -Os; done
 $ du -bhc *.o | grep total
-51K total
+28K total
 ```
 
 ## Related

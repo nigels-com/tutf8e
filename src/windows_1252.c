@@ -1,5 +1,4 @@
-#include <stddef.h>  /* size_t */
-#include <stdint.h>  /* uint16_t */
+#include <tutf8e.h>
 
 static const uint16_t windows_1252_utf8[256] =
 {
@@ -23,33 +22,5 @@ static const uint16_t windows_1252_utf8[256] =
 
 int encode_windows_1252_utf8(char *dest, size_t size, const char *src)
 {
-  unsigned char *o = (unsigned char *) dest;
-  for (const unsigned char *i = (unsigned char *) src; *i; ++i) {
-    uint16_t c = windows_1252_utf8[*i];
-    if (c<0x80) {
-      if (size<1) return -2;
-      *o++ = c;
-      size--;
-      continue;
-    }
-    if (c<0x800) {
-      if (size<2) return -2;
-      *o++ = 0xc0 | (c>>6);
-      *o++ = 0x80 | (c&0x3f);
-      size -= 2;
-      continue;
-    }
-    if (c<0xffff) {
-      if (size<3) return -2;
-      *o++ = 0xe0 | (c>>12);
-      *o++ = 0x80 | ((c>>6)&0x3f);
-      *o++ = 0x80 | (c&0x3f);
-      size -= 3;
-      continue;
-    }
-    return -1;
-  }
-  if (size<1) return -2;
-  *o++ = 0;
-  return 0;
+  return encode_utf8(dest, size, src, windows_1252_utf8);
 }
