@@ -1,6 +1,6 @@
 # tutf8e
 
-  * Tute Feighty *
+  *Tute Feighty*
 
   A tiny UTF-8 encoder for C.
 
@@ -13,5 +13,5 @@
 
 ## Related
 
-  * (iconv)[https://www.gnu.org/software/libiconv/]
-  * (icu)[http://site.icu-project.org/]
+  * [iconv](https://www.gnu.org/software/libiconv/]
+  * [icu](http://site.icu-project.org/]
