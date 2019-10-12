@@ -62,7 +62,7 @@ Jeżu klątw, spłódź Finom część gry hańb!
 
 ## How small is it?
 
-512 bytes overhead per encoding.
+512 bytes + overhead per encoding.
 
 ```
 $ for i in src/*; do gcc -c $i -O1; done
