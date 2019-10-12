@@ -1,362 +1,52 @@
 #include <stddef.h>  /* size_t */
 #include <stdint.h>  /* uint16_t */
 
+static const uint16_t iso_8859_3_utf8[256] =
+{
+  0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000a, 0x000b, 0x000c, 0x000d, 0x000e, 0x000f,
+  0x0010, 0x0011, 0x0012, 0x0013, 0x0014, 0x0015, 0x0016, 0x0017, 0x0018, 0x0019, 0x001a, 0x001b, 0x001c, 0x001d, 0x001e, 0x001f,
+  0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027, 0x0028, 0x0029, 0x002a, 0x002b, 0x002c, 0x002d, 0x002e, 0x002f,
+  0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039, 0x003a, 0x003b, 0x003c, 0x003d, 0x003e, 0x003f,
+  0x0040, 0x0041, 0x0042, 0x0043, 0x0044, 0x0045, 0x0046, 0x0047, 0x0048, 0x0049, 0x004a, 0x004b, 0x004c, 0x004d, 0x004e, 0x004f,
+  0x0050, 0x0051, 0x0052, 0x0053, 0x0054, 0x0055, 0x0056, 0x0057, 0x0058, 0x0059, 0x005a, 0x005b, 0x005c, 0x005d, 0x005e, 0x005f,
+  0x0060, 0x0061, 0x0062, 0x0063, 0x0064, 0x0065, 0x0066, 0x0067, 0x0068, 0x0069, 0x006a, 0x006b, 0x006c, 0x006d, 0x006e, 0x006f,
+  0x0070, 0x0071, 0x0072, 0x0073, 0x0074, 0x0075, 0x0076, 0x0077, 0x0078, 0x0079, 0x007a, 0x007b, 0x007c, 0x007d, 0x007e, 0x007f,
+  0x0080, 0x0081, 0x0082, 0x0083, 0x0084, 0x0085, 0x0086, 0x0087, 0x0088, 0x0089, 0x008a, 0x008b, 0x008c, 0x008d, 0x008e, 0x008f,
+  0x0090, 0x0091, 0x0092, 0x0093, 0x0094, 0x0095, 0x0096, 0x0097, 0x0098, 0x0099, 0x009a, 0x009b, 0x009c, 0x009d, 0x009e, 0x009f,
+  0x00a0, 0x0126, 0x02d8, 0x00a3, 0x00a4, 0xffff, 0x0124, 0x00a7, 0x00a8, 0x0130, 0x015e, 0x011e, 0x0134, 0x00ad, 0xffff, 0x017b,
+  0x00b0, 0x0127, 0x00b2, 0x00b3, 0x00b4, 0x00b5, 0x0125, 0x00b7, 0x00b8, 0x0131, 0x015f, 0x011f, 0x0135, 0x00bd, 0xffff, 0x017c,
+  0x00c0, 0x00c1, 0x00c2, 0xffff, 0x00c4, 0x010a, 0x0108, 0x00c7, 0x00c8, 0x00c9, 0x00ca, 0x00cb, 0x00cc, 0x00cd, 0x00ce, 0x00cf,
+  0xffff, 0x00d1, 0x00d2, 0x00d3, 0x00d4, 0x0120, 0x00d6, 0x00d7, 0x011c, 0x00d9, 0x00da, 0x00db, 0x00dc, 0x016c, 0x015c, 0x00df,
+  0x00e0, 0x00e1, 0x00e2, 0xffff, 0x00e4, 0x010b, 0x0109, 0x00e7, 0x00e8, 0x00e9, 0x00ea, 0x00eb, 0x00ec, 0x00ed, 0x00ee, 0x00ef,
+  0xffff, 0x00f1, 0x00f2, 0x00f3, 0x00f4, 0x0121, 0x00f6, 0x00f7, 0x011d, 0x00f9, 0x00fa, 0x00fb, 0x00fc, 0x016d, 0x015d, 0x02d9,
+};
 int encode_iso_8859_3_utf8(char *dest, size_t size, const char *src)
 {
   unsigned char *o = (unsigned char *) dest;
-  unsigned char *end = dest + size;
   for (const unsigned char *i = (unsigned char *) src; *i; ++i) {
-    if (*i<=127) {
-      if (end-o < 1) return -2;
-      *o++ = *i;
+    uint16_t c = iso_8859_3_utf8[*i];
+    if (c<0x80) {
+      if (size<1) return -2;
+      *o++ = c;
+      size--;
       continue;
     }
-    if (*i<128) return -1;
-    if (*i==128) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0080>>6);
-      *o++ = 0x80 | (0x0080&0x3f);
+    if (c<0x800) {
+      if (size<2) return -2;
+      *o++ = 0xc0 | (c>>6);
+      *o++ = 0x80 | (c&0x3f);
+      size -= 2;
       continue;
     }
-    if (*i<129) return -1;
-    if (*i<=160) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (*i>>6);
-      *o++ = 0x80 | (*i&0x3f);
-      continue;
-    }
-    if (*i<161) return -1;
-    if (*i==161) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0126>>6);
-      *o++ = 0x80 | (0x0126&0x3f);
-      continue;
-    }
-    if (*i<162) return -1;
-    if (*i==162) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x02d8>>6);
-      *o++ = 0x80 | (0x02d8&0x3f);
-      continue;
-    }
-    if (*i<163) return -1;
-    if (*i<=164) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (*i>>6);
-      *o++ = 0x80 | (*i&0x3f);
-      continue;
-    }
-    if (*i<166) return -1;
-    if (*i==166) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0124>>6);
-      *o++ = 0x80 | (0x0124&0x3f);
-      continue;
-    }
-    if (*i<167) return -1;
-    if (*i<=168) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (*i>>6);
-      *o++ = 0x80 | (*i&0x3f);
-      continue;
-    }
-    if (*i<169) return -1;
-    if (*i==169) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0130>>6);
-      *o++ = 0x80 | (0x0130&0x3f);
-      continue;
-    }
-    if (*i<170) return -1;
-    if (*i==170) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x015e>>6);
-      *o++ = 0x80 | (0x015e&0x3f);
-      continue;
-    }
-    if (*i<171) return -1;
-    if (*i==171) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x011e>>6);
-      *o++ = 0x80 | (0x011e&0x3f);
-      continue;
-    }
-    if (*i<172) return -1;
-    if (*i==172) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0134>>6);
-      *o++ = 0x80 | (0x0134&0x3f);
-      continue;
-    }
-    if (*i<173) return -1;
-    if (*i==173) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x00ad>>6);
-      *o++ = 0x80 | (0x00ad&0x3f);
-      continue;
-    }
-    if (*i<175) return -1;
-    if (*i==175) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x017b>>6);
-      *o++ = 0x80 | (0x017b&0x3f);
-      continue;
-    }
-    if (*i<176) return -1;
-    if (*i==176) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x00b0>>6);
-      *o++ = 0x80 | (0x00b0&0x3f);
-      continue;
-    }
-    if (*i<177) return -1;
-    if (*i==177) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0127>>6);
-      *o++ = 0x80 | (0x0127&0x3f);
-      continue;
-    }
-    if (*i<178) return -1;
-    if (*i<=181) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (*i>>6);
-      *o++ = 0x80 | (*i&0x3f);
-      continue;
-    }
-    if (*i<182) return -1;
-    if (*i==182) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0125>>6);
-      *o++ = 0x80 | (0x0125&0x3f);
-      continue;
-    }
-    if (*i<183) return -1;
-    if (*i<=184) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (*i>>6);
-      *o++ = 0x80 | (*i&0x3f);
-      continue;
-    }
-    if (*i<185) return -1;
-    if (*i==185) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0131>>6);
-      *o++ = 0x80 | (0x0131&0x3f);
-      continue;
-    }
-    if (*i<186) return -1;
-    if (*i==186) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x015f>>6);
-      *o++ = 0x80 | (0x015f&0x3f);
-      continue;
-    }
-    if (*i<187) return -1;
-    if (*i==187) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x011f>>6);
-      *o++ = 0x80 | (0x011f&0x3f);
-      continue;
-    }
-    if (*i<188) return -1;
-    if (*i==188) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0135>>6);
-      *o++ = 0x80 | (0x0135&0x3f);
-      continue;
-    }
-    if (*i<189) return -1;
-    if (*i==189) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x00bd>>6);
-      *o++ = 0x80 | (0x00bd&0x3f);
-      continue;
-    }
-    if (*i<191) return -1;
-    if (*i==191) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x017c>>6);
-      *o++ = 0x80 | (0x017c&0x3f);
-      continue;
-    }
-    if (*i<192) return -1;
-    if (*i<=194) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (*i>>6);
-      *o++ = 0x80 | (*i&0x3f);
-      continue;
-    }
-    if (*i<196) return -1;
-    if (*i==196) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x00c4>>6);
-      *o++ = 0x80 | (0x00c4&0x3f);
-      continue;
-    }
-    if (*i<197) return -1;
-    if (*i==197) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x010a>>6);
-      *o++ = 0x80 | (0x010a&0x3f);
-      continue;
-    }
-    if (*i<198) return -1;
-    if (*i==198) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0108>>6);
-      *o++ = 0x80 | (0x0108&0x3f);
-      continue;
-    }
-    if (*i<199) return -1;
-    if (*i<=207) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (*i>>6);
-      *o++ = 0x80 | (*i&0x3f);
-      continue;
-    }
-    if (*i<209) return -1;
-    if (*i<=212) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (*i>>6);
-      *o++ = 0x80 | (*i&0x3f);
-      continue;
-    }
-    if (*i<213) return -1;
-    if (*i==213) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0120>>6);
-      *o++ = 0x80 | (0x0120&0x3f);
-      continue;
-    }
-    if (*i<214) return -1;
-    if (*i<=215) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (*i>>6);
-      *o++ = 0x80 | (*i&0x3f);
-      continue;
-    }
-    if (*i<216) return -1;
-    if (*i==216) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x011c>>6);
-      *o++ = 0x80 | (0x011c&0x3f);
-      continue;
-    }
-    if (*i<217) return -1;
-    if (*i<=220) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (*i>>6);
-      *o++ = 0x80 | (*i&0x3f);
-      continue;
-    }
-    if (*i<221) return -1;
-    if (*i==221) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x016c>>6);
-      *o++ = 0x80 | (0x016c&0x3f);
-      continue;
-    }
-    if (*i<222) return -1;
-    if (*i==222) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x015c>>6);
-      *o++ = 0x80 | (0x015c&0x3f);
-      continue;
-    }
-    if (*i<223) return -1;
-    if (*i<=226) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (*i>>6);
-      *o++ = 0x80 | (*i&0x3f);
-      continue;
-    }
-    if (*i<228) return -1;
-    if (*i==228) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x00e4>>6);
-      *o++ = 0x80 | (0x00e4&0x3f);
-      continue;
-    }
-    if (*i<229) return -1;
-    if (*i==229) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x010b>>6);
-      *o++ = 0x80 | (0x010b&0x3f);
-      continue;
-    }
-    if (*i<230) return -1;
-    if (*i==230) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0109>>6);
-      *o++ = 0x80 | (0x0109&0x3f);
-      continue;
-    }
-    if (*i<231) return -1;
-    if (*i<=239) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (*i>>6);
-      *o++ = 0x80 | (*i&0x3f);
-      continue;
-    }
-    if (*i<241) return -1;
-    if (*i<=244) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (*i>>6);
-      *o++ = 0x80 | (*i&0x3f);
-      continue;
-    }
-    if (*i<245) return -1;
-    if (*i==245) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x0121>>6);
-      *o++ = 0x80 | (0x0121&0x3f);
-      continue;
-    }
-    if (*i<246) return -1;
-    if (*i<=247) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (*i>>6);
-      *o++ = 0x80 | (*i&0x3f);
-      continue;
-    }
-    if (*i<248) return -1;
-    if (*i==248) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x011d>>6);
-      *o++ = 0x80 | (0x011d&0x3f);
-      continue;
-    }
-    if (*i<249) return -1;
-    if (*i<=252) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (*i>>6);
-      *o++ = 0x80 | (*i&0x3f);
-      continue;
-    }
-    if (*i<253) return -1;
-    if (*i==253) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x016d>>6);
-      *o++ = 0x80 | (0x016d&0x3f);
-      continue;
-    }
-    if (*i<254) return -1;
-    if (*i==254) {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x015d>>6);
-      *o++ = 0x80 | (0x015d&0x3f);
-      continue;
-    }
-    if (*i<255) return -1;
-    /* if (*i<=255) */ {
-      if (end-o < 2) return -2;
-      *o++ = 0xc0 | (0x02d9>>6);
-      *o++ = 0x80 | (0x02d9&0x3f);
+    if (c<0xffff) {
+      if (size<3) return -2;
+      *o++ = 0xe0 | (c>>12);
+      *o++ = 0x80 | ((c>>6)&0x3f);
+      *o++ = 0x80 | (c&0x3f);
+      size -= 3;
       continue;
     }
     return -1;
   }
-  if (end-o < 1) return -2;
-  *o++ = 0;
   return 0;
 }

@@ -25,45 +25,6 @@ with open('include/tutf8e.h', 'w') as include:
 
     print('Encoding: %s'%(e))
 
-    for i in range(0,256):
-      try:
-        v = ord(bytes([i]).decode(e)[0])
-        mapping[i] = v
-        domain.append(i)
-      except:
-        pass
-
-    #print(mapping)
-    #print(domain)
-
-    # Segment the domain into contiguous ranges of same UTF-8 length
-
-    segments = []
-    s = []
-    for i in domain:
-      if not len(s):
-        s.append(i)
-      else:
-        p = s[-1]
-        if mapping[p]+1==mapping[i] and (
-          (p<0x80 and i<0x80) or
-          (p>0x80 and i>0x80 and p<0x800 and i<0x800) or
-          (p>0x800 and i>0x800)):
-          s.append(i)
-        else:
-          segments.append(s)
-          s = [ i ]
-    if len(s):
-      segments.append(s)
-
-    #print(segments)
-
-    # Simplify segments
-
-    segments = [ [i[0], i[-1]] for i in segments ]
-
-    print(segments)
-
     include.write('extern int encode_%s_utf8(char *dest, size_t size, const char *src);\n'%(name))
 
     with open('src/%s.c'%(name), 'w') as src:
@@ -73,69 +34,50 @@ with open('include/tutf8e.h', 'w') as include:
       src.write('#include <stddef.h>  /* size_t */\n')
       src.write('#include <stdint.h>  /* uint16_t */\n')
       src.write('\n')
+
+      v = []
+      for i in range(0,256):
+        try:
+          v.append(ord(bytes([i]).decode(e)[0]))
+        except:
+          v.append(0xffff)
+          pass
+
+      src.write('static const uint16_t %s_utf8[256] =\n'%(name))
+      src.write('{\n')
+      for i in range(0,256,16):
+        src.write('  %s,\n'%(', '.join([ '0x%04x'%(i) for i in v[i:i+16]])))
+      src.write('};\n')
+
       src.write('int encode_%s_utf8(char *dest, size_t size, const char *src)\n'%(name))
       src.write('{\n')
 
       src.write('  unsigned char *o = (unsigned char *) dest;\n')
-      src.write('  unsigned char *end = dest + size;\n')
       src.write('  for (const unsigned char *i = (unsigned char *) src; *i; ++i) {\n')
-
-      if len(segments):
-          for i in segments:
-              if i[0]>0:
-                src.write('    if (*i<%d) return -1;\n'%(i[0]))
-              if i[1]==255:
-                src.write('    /* if (*i<=255) */ {\n')
-              else:
-                if i[0]==i[1]:
-                  src.write('    if (*i==%d) {\n'%(i[1]))
-                else:
-                  src.write('    if (*i<=%d) {\n'%(i[1]))
-              v = mapping[i[0]]
-              if v<0x80:
-                src.write('      if (end-o < 1) return -2;\n')
-                if v==0:
-                  if i[0]==0:
-                    src.write('      *o++ = *i;\n')
-                  else:
-                    src.write('      *o++ = *i - %d;\n'%(i[0]))
-                else:
-                  src.write('      *o++ = 0x%04x + *i - %d;\n'%(mapping[i[0]], i[0]))
-              elif v<0x800:
-                  src.write('      if (end-o < 2) return -2;\n')
-                  if i[0]==i[1]:
-                      src.write('      *o++ = 0xc0 | (0x%04x>>6);\n'%(mapping[i[0]]))
-                      src.write('      *o++ = 0x80 | (0x%04x&0x3f);\n'%(mapping[i[0]]))
-                  else:
-                      if i[0]==v:
-                        src.write('      *o++ = 0xc0 | (*i>>6);\n')
-                        src.write('      *o++ = 0x80 | (*i&0x3f);\n')
-                      else:
-                        src.write('      uint16_t v = 0x%04x + *i - %du;\n'%(mapping[i[0]], i[0]))
-                        src.write('      *o++ = 0xc0 | (v>>6);\n')
-                        src.write('      *o++ = 0x80 | (v&0x3f);\n')
-              elif v<0x10000:
-                  src.write('      if (end-o < 3) return -2;\n')
-                  if i[0]==i[1]:
-                      src.write('      *o++ = 0xe0 | (0x%04x>>12);\n'%(mapping[i[0]]))
-                      src.write('      *o++ = 0x80 | ((0x%04x>>6)&0x3f);\n'%(mapping[i[0]]))
-                      src.write('      *o++ = 0x80 | (0x%04x&0x3f);\n'%(mapping[i[0]]))
-                  else:
-                      if i[0]==v:
-                        src.write('      *o++ = 0xe0 | (*i>>12);\n')
-                        src.write('      *o++ = 0x80 | ((*i>>6)&0x3f);\n')
-                        src.write('      *o++ = 0x80 | (*i&0x3f);\n')
-                      else:
-                        src.write('      uint16_t v = 0x%04x + *i - %du;\n'%(mapping[i[0]], i[0]))
-                        src.write('      *o++ = 0xe0 | (v>>12);\n')
-                        src.write('      *o++ = 0x80 | ((v>>6)&0x3f);\n')
-                        src.write('      *o++ = 0x80 | (v&0x3f);\n')
-              src.write('      continue;\n')
-              src.write('    }\n')
-          src.write('    return -1;\n')
+      src.write('    uint16_t c = %s_utf8[*i];\n'%(name))
+      src.write('    if (c<0x80) {\n')
+      src.write('      if (size<1) return -2;\n')
+      src.write('      *o++ = c;\n')
+      src.write('      size--;\n')
+      src.write('      continue;\n')
+      src.write('    }\n')
+      src.write('    if (c<0x800) {\n')
+      src.write('      if (size<2) return -2;\n')
+      src.write('      *o++ = 0xc0 | (c>>6);\n')
+      src.write('      *o++ = 0x80 | (c&0x3f);\n')
+      src.write('      size -= 2;\n')
+      src.write('      continue;\n')
+      src.write('    }\n')
+      src.write('    if (c<0xffff) {\n')
+      src.write('      if (size<3) return -2;\n')
+      src.write('      *o++ = 0xe0 | (c>>12);\n')
+      src.write('      *o++ = 0x80 | ((c>>6)&0x3f);\n')
+      src.write('      *o++ = 0x80 | (c&0x3f);\n')
+      src.write('      size -= 3;\n')
+      src.write('      continue;\n')
+      src.write('    }\n')
+      src.write('    return -1;\n')
       src.write('  }\n')
-      src.write('  if (end-o < 1) return -2;\n')
-      src.write('  *o++ = 0;\n')
       src.write('  return 0;\n')
       src.write('}\n')
 

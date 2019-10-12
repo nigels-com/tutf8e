@@ -67,15 +67,15 @@ Not small enough.
 ```
 $ for i in src/*; do gcc -c $i -O1; done
 $ du -bhc *.o | grep total
-87K total
+52K total
 
 $ for i in src/*; do gcc -c $i -O3; done
 $ du -bhc *.o | grep total
-63K total
+51K total
 
 $ for i in src/*; do gcc -c $i -Os; done
 $ du -bhc *.o | grep total
-55K total
+51K total
 ```
 
 ## Related
