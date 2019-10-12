@@ -124,12 +124,20 @@ with open('test/test.c', 'w') as test:
 
   for i in tests:
     if i[1] in encodings:
-      test.write('  const char %s[] = { %s };\n'%(i[0], ', '.join(['%d'%(i) for i in i[2].encode(i[1])] + [ '0' ])))
+      test.write('  static const char %s[] = {\n'%(i[0]))
+      data = [i for i in i[2].encode(i[1])] + [ 0 ]
+      for i in range(0, len(data), 24):
+        test.write('    %s,\n'%(', '.join([ '0x%02x'%(j) for j in data[i:i+24]])))
+      test.write('  };\n')
 
   test.write('\n')
   for i in tests:
     if i[1] in encodings:
-      test.write('  const char %sUTF8[] = { %s };\n'%(i[0], ', '.join(['%d'%(i) for i in i[2].encode('utf-8')] + [ '0' ])))
+      test.write('  static const char %sUTF8[] = {\n'%(i[0]))
+      data = [i for i in i[2].encode('utf-8')] + [ 0 ]
+      for i in range(0, len(data), 24):
+        test.write('    %s,\n'%(', '.join([ '0x%02x'%(j) for j in data[i:i+24]])))
+      test.write('  };\n')
 
   test.write('\n')
   for i in tests:
@@ -144,7 +152,6 @@ with open('test/test.c', 'w') as test:
       test.write('  }\n')
       test.write('\n')
 
-  test.write('\n')
   test.write('  printf("%d passed, %d failed tests\\n", pass, fail);\n')
 
   test.write('}\n')
