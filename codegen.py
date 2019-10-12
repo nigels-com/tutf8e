@@ -199,4 +199,7 @@ with open('test/test.c', 'w') as test:
       test.write('  }\n')
       test.write('\n')
 
+  test.write('\n')
+  test.write('  printf("%d passed, %d failed tests\\n", pass, fail);\n')
+
   test.write('}\n')

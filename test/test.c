@@ -134,4 +134,6 @@ int main(int argc, char *argv[])
     fail++;
   }
 
+
+  printf("%d passed, %d failed tests\n", pass, fail);
 }

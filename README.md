@@ -38,6 +38,28 @@
   * [windows-1257](https://en.wikipedia.org/wiki/Windows-1257) Baltic
   * [windows-1258](https://en.wikipedia.org/wiki/Windows-1258) Vietnamese
 
+## Test Procedure
+
+```
+$ ./codegen.py
+
+$ gcc src/* test/test.c -Iinclude
+
+$ ./a.out
+A quick brown fox jumps over the lazy dog
+Nechť již hříšné saxofony ďáblů rozezvučí síň úděsnými tóny waltzu, tanga a quickstepu.
+Pijamalı hasta yağız şoföre çabucak güvendi.
+Põdur Zagrebi tšellomängija-följetonist Ciqo külmetas kehvas garaažis
+В чащах юга жил бы цитрус? Да, но фальшивый экземпляр!
+διαφυλάξτε γενικά τη ζωή σας από βαθειά ψυχικά τραύματα
+עטלף אבק נס דרך מזגן שהתפוצץ כי חם
+Pijamalı hasta yağız şoföre çabucak güvendi.
+Flygande bäckasiner söka hwila på mjuka tuvor.
+เป็นมนุษย์สุดประเสริฐเลิศคุณค่า กว่าบรรดาฝูงสัตว์เดรัจฉาน จงฝ่าฟันพัฒนาวิชาการ อย่าล้างผลาญฤๅเข่นฆ่าบีฑาใคร ไม่ถือโทษโกรธแช่งซัดฮึดฮัดด่า หัดอภัยเหมือนกีฬาอัชฌาสัย ปฏิบัติประพฤติกฎกำหนดใจ พูดจาให้จ๊ะๆ จ๋าๆ น่าฟังเอยฯ
+Jeżu klątw, spłódź Finom część gry hańb!
+11 passed, 0 failed tests
+```
+
 ## Related
 
   * [iconv](https://www.gnu.org/software/libiconv/)
