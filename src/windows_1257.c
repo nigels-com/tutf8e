@@ -24,5 +24,5 @@ static const uint16_t windows_1257_utf8[256] =
 int encode_windows_1257_utf8(char *dest, size_t size, const char *src)
 {
   size_t len = strlen(src) + 1;
-  return encode_utf8(windows_1257_utf8, (const unsigned char **) &src, &len, (unsigned char **) &dest, &size);
+  return encode_utf8(windows_1257_utf8, &src, &len, &dest, &size);
 }
