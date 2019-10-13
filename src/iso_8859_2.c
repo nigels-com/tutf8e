@@ -1,4 +1,5 @@
 #include <tutf8e.h>
+#include <string.h>
 
 static const uint16_t iso_8859_2_utf8[256] =
 {
@@ -22,5 +23,6 @@ static const uint16_t iso_8859_2_utf8[256] =
 
 int encode_iso_8859_2_utf8(char *dest, size_t size, const char *src)
 {
-  return encode_utf8(dest, size, src, iso_8859_2_utf8);
+  size_t len = strlen(src);
+  return encode_utf8(iso_8859_2_utf8, &src, &len, &dest, &size);
 }
