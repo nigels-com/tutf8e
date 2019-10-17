@@ -84,7 +84,6 @@ with open('include/tutf8e.h', 'w') as include:
 
 #include <stddef.h>  /* size_t */
 #include <stdint.h>  /* uint16_t */
-#include <stdlib.h>  /* malloc/free */
 
 extern int length_utf8(const uint16_t *table, const char *i, size_t ilen, size_t *length);
 extern int encode_utf8(const uint16_t *table, const char *i, size_t ilen, char *o, size_t olen);
@@ -99,7 +98,9 @@ extern int encode_utf8(const uint16_t *table, const char *i, size_t ilen, char *
 
     print('Encoding: %s'%(e))
 
-    include.write('extern int encode_%s_utf8(char *dest, size_t size, const char *src);\n'%(name))
+#   include.write('\n/* %s */\n'%(e))
+#   include.write('extern char * encode_%s_to_utf8(const char *input);\n'%(name))
+    include.write('extern int encode_%s_utf8(char *dest, size_t size, const char *input);\n'%(name))
 
     with open('src/%s.c'%(name), 'w') as src:
 
@@ -107,6 +108,7 @@ extern int encode_utf8(const uint16_t *table, const char *i, size_t ilen, char *
 
       src.write('#include <tutf8e.h>\n')
       src.write('#include <string.h>\n')
+#     src.write('#include <stdlib.h>  /* malloc/free */\n')
       src.write('\n')
 
       v = []
@@ -123,20 +125,20 @@ extern int encode_utf8(const uint16_t *table, const char *i, size_t ilen, char *
         src.write('  %s,\n'%(', '.join([ '0x%04x'%(i) for i in v[i:i+16]])))
       src.write('};\n')
 
-      src.write('\n')
-      src.write('char * encode_%s_to_utf8(const char *input)\n'%(name))
-      src.write('{\n')
-      src.write('  size_t ilen = strlen(input) + 1;\n')
-      src.write('  size_t olen = 0;\n')
-      src.write('  if (!length_utf8(%s_utf8, input, ilen, &olen) && olen) {\n'%(name))
-      src.write('    char * output = malloc(olen);\n')
-      src.write('    if (!encode_utf8(%s_utf8, input, ilen, output, olen)) {\n'%(name))
-      src.write('      return output;\n')
-      src.write('    }\n')
-      src.write('    free(output);\n')
-      src.write('  }\n')
-      src.write('  return NULL;\n')
-      src.write('}\n')
+      # src.write('\n')
+      # src.write('char * encode_%s_to_utf8(const char *input)\n'%(name))
+      # src.write('{\n')
+      # src.write('  size_t ilen = strlen(input) + 1;\n')
+      # src.write('  size_t olen = 0;\n')
+      # src.write('  if (!length_utf8(%s_utf8, input, ilen, &olen) && olen) {\n'%(name))
+      # src.write('    char * output = malloc(olen);\n')
+      # src.write('    if (!encode_utf8(%s_utf8, input, ilen, output, olen)) {\n'%(name))
+      # src.write('      return output;\n')
+      # src.write('    }\n')
+      # src.write('    free(output);\n')
+      # src.write('  }\n')
+      # src.write('  return NULL;\n')
+      # src.write('}\n')
 
       src.write('\n')
       src.write('int encode_%s_utf8(char *dest, size_t size, const char *src)\n'%(name))
