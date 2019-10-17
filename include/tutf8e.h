@@ -4,9 +4,10 @@
 
 #include <stddef.h>  /* size_t */
 #include <stdint.h>  /* uint16_t */
+#include <stdlib.h>  /* malloc/free */
 
-extern int length_utf8(const uint16_t *table, const char **i, size_t *ileft, size_t *length);
-extern int encode_utf8(const uint16_t *table, const char **i, size_t *ileft, char **o, size_t *oleft);
+extern int length_utf8(const uint16_t *table, const char *i, size_t ilen, size_t *length);
+extern int encode_utf8(const uint16_t *table, const char *i, size_t ilen, char *o, size_t olen);
 extern int encode_iso_8859_1_utf8(char *dest, size_t size, const char *src);
 extern int encode_iso_8859_10_utf8(char *dest, size_t size, const char *src);
 extern int encode_iso_8859_11_utf8(char *dest, size_t size, const char *src);

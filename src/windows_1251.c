@@ -21,8 +21,22 @@ static const uint16_t windows_1251_utf8[256] =
   0x0440, 0x0441, 0x0442, 0x0443, 0x0444, 0x0445, 0x0446, 0x0447, 0x0448, 0x0449, 0x044a, 0x044b, 0x044c, 0x044d, 0x044e, 0x044f,
 };
 
+char * encode_windows_1251_to_utf8(const char *input)
+{
+  size_t ilen = strlen(input) + 1;
+  size_t olen = 0;
+  if (!length_utf8(windows_1251_utf8, input, ilen, &olen) && olen) {
+    char * output = malloc(olen);
+    if (!encode_utf8(windows_1251_utf8, input, ilen, output, olen)) {
+      return output;
+    }
+    free(output);
+  }
+  return NULL;
+}
+
 int encode_windows_1251_utf8(char *dest, size_t size, const char *src)
 {
   size_t len = strlen(src) + 1;
-  return encode_utf8(windows_1251_utf8, &src, &len, &dest, &size);
+  return encode_utf8(windows_1251_utf8, src, len, dest, size);
 }

@@ -21,8 +21,22 @@ static const uint16_t iso_8859_5_utf8[256] =
   0x2116, 0x0451, 0x0452, 0x0453, 0x0454, 0x0455, 0x0456, 0x0457, 0x0458, 0x0459, 0x045a, 0x045b, 0x045c, 0x00a7, 0x045e, 0x045f,
 };
 
+char * encode_iso_8859_5_to_utf8(const char *input)
+{
+  size_t ilen = strlen(input) + 1;
+  size_t olen = 0;
+  if (!length_utf8(iso_8859_5_utf8, input, ilen, &olen) && olen) {
+    char * output = malloc(olen);
+    if (!encode_utf8(iso_8859_5_utf8, input, ilen, output, olen)) {
+      return output;
+    }
+    free(output);
+  }
+  return NULL;
+}
+
 int encode_iso_8859_5_utf8(char *dest, size_t size, const char *src)
 {
   size_t len = strlen(src) + 1;
-  return encode_utf8(iso_8859_5_utf8, &src, &len, &dest, &size);
+  return encode_utf8(iso_8859_5_utf8, src, len, dest, size);
 }

@@ -18,11 +18,10 @@ with open('src/tutf8e.c', 'w') as src:
 /* return ENOENT if input character is not convertable                       */
 /* return 0 for success                                                      */
 
-int length_utf8(const uint16_t *table, const char **ibuf, size_t *ileft, size_t *length)
+int length_utf8(const uint16_t *table, const char *ibuf, size_t ileft, size_t *length)
 {
-  size_t len = 0;
-  for (const unsigned char **i = (const unsigned char **) ibuf; *ileft; *i += 1, *ileft -= 1) {
-    const uint16_t c = table[**i];
+  for (const unsigned char *i = (const unsigned char *) ibuf; ileft; ++i, --ileft) {
+    const uint16_t c = table[*i];
     if (c<0x80) {
       ++*length;
       continue;
@@ -45,30 +44,30 @@ int length_utf8(const uint16_t *table, const char **ibuf, size_t *ileft, size_t 
 /* return ENOENT if input character is not convertable */
 /* return 0 for success                                */
 
-int encode_utf8(const uint16_t *table, const char **ibuf, size_t *ileft, char **obuf, size_t *oleft)
+int encode_utf8(const uint16_t *table, const char *ibuf, size_t ilen, char *obuf, size_t olen)
 {
-  unsigned char **o = (unsigned char **) obuf;
-  for (const unsigned char **i = (const unsigned char **) ibuf; *ileft; *i += 1, *ileft -= 1) {
-    const uint16_t c = table[**i];
+  unsigned char *o = (unsigned char *) obuf;
+  for (const unsigned char *i = (const unsigned char *) ibuf; ilen; ++i, --ilen) {
+    const uint16_t c = table[*i];
     if (c<0x80) {
-      if (*oleft<1) return E2BIG;
-      *((*o)++) = c;
-      *oleft -= 1;
+      if (olen<1) return E2BIG;
+      *(o++) = c;
+      olen -= 1;
       continue;
     }
     if (c<0x800) {
-      if (*oleft<2) return E2BIG;
-      *((*o)++) = 0xc0 | (c>>6);
-      *((*o)++) = 0x80 | (c&0x3f);
-      *oleft -= 2;
+      if (olen<2) return E2BIG;
+      *(o++) = 0xc0 | (c>>6);
+      *(o++) = 0x80 | (c&0x3f);
+      olen -= 2;
       continue;
     }
     if (c<0xffff) {
-      if (*oleft<3) return E2BIG;
-      *((*o)++) = 0xe0 | (c>>12);
-      *((*o)++) = 0x80 | ((c>>6)&0x3f);
-      *((*o)++) = 0x80 | (c&0x3f);
-      *oleft -= 3;
+      if (olen<3) return E2BIG;
+      *(o++) = 0xe0 | (c>>12);
+      *(o++) = 0x80 | ((c>>6)&0x3f);
+      *(o++) = 0x80 | (c&0x3f);
+      olen -= 3;
       continue;
     }
     return ENOENT;
@@ -85,9 +84,10 @@ with open('include/tutf8e.h', 'w') as include:
 
 #include <stddef.h>  /* size_t */
 #include <stdint.h>  /* uint16_t */
+#include <stdlib.h>  /* malloc/free */
 
-extern int length_utf8(const uint16_t *table, const char **i, size_t *ileft, size_t *length);
-extern int encode_utf8(const uint16_t *table, const char **i, size_t *ileft, char **o, size_t *oleft);
+extern int length_utf8(const uint16_t *table, const char *i, size_t ilen, size_t *length);
+extern int encode_utf8(const uint16_t *table, const char *i, size_t ilen, char *o, size_t olen);
 ''')
 
   for e in sorted(encodings):
@@ -124,10 +124,25 @@ extern int encode_utf8(const uint16_t *table, const char **i, size_t *ileft, cha
       src.write('};\n')
 
       src.write('\n')
+      src.write('char * encode_%s_to_utf8(const char *input)\n'%(name))
+      src.write('{\n')
+      src.write('  size_t ilen = strlen(input) + 1;\n')
+      src.write('  size_t olen = 0;\n')
+      src.write('  if (!length_utf8(%s_utf8, input, ilen, &olen) && olen) {\n'%(name))
+      src.write('    char * output = malloc(olen);\n')
+      src.write('    if (!encode_utf8(%s_utf8, input, ilen, output, olen)) {\n'%(name))
+      src.write('      return output;\n')
+      src.write('    }\n')
+      src.write('    free(output);\n')
+      src.write('  }\n')
+      src.write('  return NULL;\n')
+      src.write('}\n')
+
+      src.write('\n')
       src.write('int encode_%s_utf8(char *dest, size_t size, const char *src)\n'%(name))
       src.write('{\n')
       src.write('  size_t len = strlen(src) + 1;\n')
-      src.write('  return encode_utf8(%s_utf8, &src, &len, &dest, &size);\n'%(name))
+      src.write('  return encode_utf8(%s_utf8, src, len, dest, size);\n'%(name))
       src.write('}\n')
 
   include.write('\n')
