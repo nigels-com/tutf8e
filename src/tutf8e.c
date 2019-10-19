@@ -3,6 +3,31 @@
 
 #include <sys/errno.h>
 
+/* Determine the input length and UTF8 encoded length of NUL-terminated input string */
+/* return ENOENT if input character is not convertable                               */
+/* return 0 for success                                                              */
+
+int tutf8e_string_length(const uint16_t *table, const char *input, size_t *ilen, size_t *olen)
+{
+  for (const unsigned char *i = (const unsigned char *) input; *i; ++i, (*ilen)++) {
+    const uint16_t c = table[*i];
+    if (c<0x80) {
+      *olen += 1;
+      continue;
+    }
+    if (c<0x800) {
+      *olen += 2;
+      continue;
+    }
+    if (c<0xffff) {
+      *olen += 3;
+      continue;
+    }
+    return ENOENT;
+  }
+  return 0;
+}
+
 /* Determine the length of the UTF8 encoding of given input string and table */
 /* return ENOENT if input character is not convertable                       */
 /* return 0 for success                                                      */

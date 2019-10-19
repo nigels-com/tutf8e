@@ -1,5 +1,7 @@
 #include <tutf8e.h>
-#include <string.h>
+
+#include <string.h> /* strlen */
+#include <stdlib.h> /* malloc/free */
 
 static const uint16_t iso_8859_5_utf8[256] =
 {
@@ -30,4 +32,20 @@ int tutf8e_string_encode_iso_8859_5(char *output, size_t olen, const char *input
 int tutf8e_buffer_encode_iso_8859_5(char *output, size_t olen, const char *input, size_t ilen)
 {
   return tutf8e_buffer_encode(iso_8859_5_utf8, input, ilen, output, olen);
+}
+
+char * tutf8e_string_encode_iso_8859_5_realloc(char *input)
+{
+  size_t ilen = 0;
+  size_t olen = 0;
+  if (input && !tutf8e_string_length(iso_8859_5_utf8, input, &ilen, &olen) && ilen && olen && ilen!=olen) {
+    char * output = malloc(olen + 1);
+    if (!tutf8e_buffer_encode(iso_8859_5_utf8, input, ilen, output, olen)) {
+      free(input);
+      output[olen] = 0;
+      return output;
+    }
+    free(output);
+  }
+  return input;
 }
