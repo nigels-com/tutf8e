@@ -301,6 +301,7 @@ with open('test/test.c', 'w') as test:
       test.write('    printf("Failed to encode %s test\\n");\n'%(i[0]))
       test.write('    fail++;\n')
       test.write('  }\n')
+      test.write('  free(encoded);\n')
       test.write('\n')
 
   test.write('  printf("%d passed, %d failed tests\\n", pass, fail);\n')

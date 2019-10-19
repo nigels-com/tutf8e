@@ -379,6 +379,7 @@ int main(int argc, char *argv[])
     printf("Failed to encode english test\n");
     fail++;
   }
+  free(encoded);
 
   encoded = tutf8e_string_encode_iso_8859_2_realloc(strdup(czech));
   if (encoded && !strcmp(encoded, czechUTF8)) {
@@ -388,6 +389,7 @@ int main(int argc, char *argv[])
     printf("Failed to encode czech test\n");
     fail++;
   }
+  free(encoded);
 
   encoded = tutf8e_string_encode_iso_8859_3_realloc(strdup(turkish));
   if (encoded && !strcmp(encoded, turkishUTF8)) {
@@ -397,6 +399,7 @@ int main(int argc, char *argv[])
     printf("Failed to encode turkish test\n");
     fail++;
   }
+  free(encoded);
 
   encoded = tutf8e_string_encode_iso_8859_4_realloc(strdup(estonian));
   if (encoded && !strcmp(encoded, estonianUTF8)) {
@@ -406,6 +409,7 @@ int main(int argc, char *argv[])
     printf("Failed to encode estonian test\n");
     fail++;
   }
+  free(encoded);
 
   encoded = tutf8e_string_encode_iso_8859_5_realloc(strdup(russian));
   if (encoded && !strcmp(encoded, russianUTF8)) {
@@ -415,6 +419,7 @@ int main(int argc, char *argv[])
     printf("Failed to encode russian test\n");
     fail++;
   }
+  free(encoded);
 
   encoded = tutf8e_string_encode_iso_8859_7_realloc(strdup(greek));
   if (encoded && !strcmp(encoded, greekUTF8)) {
@@ -424,6 +429,7 @@ int main(int argc, char *argv[])
     printf("Failed to encode greek test\n");
     fail++;
   }
+  free(encoded);
 
   encoded = tutf8e_string_encode_iso_8859_8_realloc(strdup(hebrew));
   if (encoded && !strcmp(encoded, hebrewUTF8)) {
@@ -433,6 +439,7 @@ int main(int argc, char *argv[])
     printf("Failed to encode hebrew test\n");
     fail++;
   }
+  free(encoded);
 
   encoded = tutf8e_string_encode_iso_8859_9_realloc(strdup(turkish2));
   if (encoded && !strcmp(encoded, turkish2UTF8)) {
@@ -442,6 +449,7 @@ int main(int argc, char *argv[])
     printf("Failed to encode turkish2 test\n");
     fail++;
   }
+  free(encoded);
 
   encoded = tutf8e_string_encode_iso_8859_10_realloc(strdup(swedish));
   if (encoded && !strcmp(encoded, swedishUTF8)) {
@@ -451,6 +459,7 @@ int main(int argc, char *argv[])
     printf("Failed to encode swedish test\n");
     fail++;
   }
+  free(encoded);
 
   encoded = tutf8e_string_encode_iso_8859_11_realloc(strdup(thai));
   if (encoded && !strcmp(encoded, thaiUTF8)) {
@@ -460,6 +469,7 @@ int main(int argc, char *argv[])
     printf("Failed to encode thai test\n");
     fail++;
   }
+  free(encoded);
 
   encoded = tutf8e_string_encode_iso_8859_13_realloc(strdup(polish));
   if (encoded && !strcmp(encoded, polishUTF8)) {
@@ -469,6 +479,7 @@ int main(int argc, char *argv[])
     printf("Failed to encode polish test\n");
     fail++;
   }
+  free(encoded);
 
   printf("%d passed, %d failed tests\n", pass, fail);
 }
