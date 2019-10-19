@@ -190,7 +190,7 @@ extern int tutf8e_buffer_encode(const uint16_t *table, const char *i, size_t ile
       src.write('  size_t olen = 0;\n')
       src.write('  if (input && !tutf8e_string_length(%s_utf8, input, &ilen, &olen) && ilen && olen && ilen!=olen) {\n'%(name))
       src.write('    char * output = malloc(olen + 1);\n')
-      src.write('    if (!tutf8e_buffer_encode(%s_utf8, input, ilen, output, olen)) {\n'%(name))
+      src.write('    if (output && !tutf8e_buffer_encode(%s_utf8, input, ilen, output, olen)) {\n'%(name))
       src.write('      free(input);\n')
       src.write('      output[olen] = 0;\n')
       src.write('      return output;\n')
