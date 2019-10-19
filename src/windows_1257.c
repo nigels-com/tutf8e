@@ -21,8 +21,13 @@ static const uint16_t windows_1257_utf8[256] =
   0x0161, 0x0144, 0x0146, 0x00f3, 0x014d, 0x00f5, 0x00f6, 0x00f7, 0x0173, 0x0142, 0x015b, 0x016b, 0x00fc, 0x017c, 0x017e, 0x02d9,
 };
 
-int encode_windows_1257_utf8(char *dest, size_t size, const char *src)
+int tutf8e_string_encode_windows_1257(char *output, size_t olen, const char *input)
 {
-  size_t len = strlen(src) + 1;
-  return encode_utf8(windows_1257_utf8, src, len, dest, size);
+  size_t len = strlen(input) + 1;
+  return tutf8e_buffer_encode(windows_1257_utf8, input, len, output, olen);
+}
+
+int tutf8e_buffer_encode_windows_1257(char *output, size_t olen, const char *input, size_t ilen)
+{
+  return tutf8e_buffer_encode(windows_1257_utf8, input, ilen, output, olen);
 }

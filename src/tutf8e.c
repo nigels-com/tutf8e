@@ -7,9 +7,9 @@
 /* return ENOENT if input character is not convertable                       */
 /* return 0 for success                                                      */
 
-int length_utf8(const uint16_t *table, const char *ibuf, size_t ileft, size_t *length)
+int tutf8e_buffer_length(const uint16_t *table, const char *input, size_t ilen, size_t *length)
 {
-  for (const unsigned char *i = (const unsigned char *) ibuf; ileft; ++i, --ileft) {
+  for (const unsigned char *i = (const unsigned char *) input; ilen; ++i, --ilen) {
     const uint16_t c = table[*i];
     if (c<0x80) {
       ++*length;
@@ -33,10 +33,10 @@ int length_utf8(const uint16_t *table, const char *ibuf, size_t ileft, size_t *l
 /* return ENOENT if input character is not convertable */
 /* return 0 for success                                */
 
-int encode_utf8(const uint16_t *table, const char *ibuf, size_t ilen, char *obuf, size_t olen)
+int tutf8e_buffer_encode(const uint16_t *table, const char *input, size_t ilen, char *output, size_t olen)
 {
-  unsigned char *o = (unsigned char *) obuf;
-  for (const unsigned char *i = (const unsigned char *) ibuf; ilen; ++i, --ilen) {
+  unsigned char *o = (unsigned char *) output;
+  for (const unsigned char *i = (const unsigned char *) input; ilen; ++i, --ilen) {
     const uint16_t c = table[*i];
     if (c<0x80) {
       if (olen<1) return E2BIG;

@@ -18,9 +18,9 @@ with open('src/tutf8e.c', 'w') as src:
 /* return ENOENT if input character is not convertable                       */
 /* return 0 for success                                                      */
 
-int length_utf8(const uint16_t *table, const char *ibuf, size_t ileft, size_t *length)
+int tutf8e_buffer_length(const uint16_t *table, const char *input, size_t ilen, size_t *length)
 {
-  for (const unsigned char *i = (const unsigned char *) ibuf; ileft; ++i, --ileft) {
+  for (const unsigned char *i = (const unsigned char *) input; ilen; ++i, --ilen) {
     const uint16_t c = table[*i];
     if (c<0x80) {
       ++*length;
@@ -44,10 +44,10 @@ int length_utf8(const uint16_t *table, const char *ibuf, size_t ileft, size_t *l
 /* return ENOENT if input character is not convertable */
 /* return 0 for success                                */
 
-int encode_utf8(const uint16_t *table, const char *ibuf, size_t ilen, char *obuf, size_t olen)
+int tutf8e_buffer_encode(const uint16_t *table, const char *input, size_t ilen, char *output, size_t olen)
 {
-  unsigned char *o = (unsigned char *) obuf;
-  for (const unsigned char *i = (const unsigned char *) ibuf; ilen; ++i, --ilen) {
+  unsigned char *o = (unsigned char *) output;
+  for (const unsigned char *i = (const unsigned char *) input; ilen; ++i, --ilen) {
     const uint16_t c = table[*i];
     if (c<0x80) {
       if (olen<1) return E2BIG;
@@ -85,9 +85,22 @@ with open('include/tutf8e.h', 'w') as include:
 #include <stddef.h>  /* size_t */
 #include <stdint.h>  /* uint16_t */
 
-extern int length_utf8(const uint16_t *table, const char *i, size_t ilen, size_t *length);
-extern int encode_utf8(const uint16_t *table, const char *i, size_t ilen, char *o, size_t olen);
+/* Internal API */
+extern int tutf8e_buffer_length(const uint16_t *table, const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_encode(const uint16_t *table, const char *i, size_t ilen, char *output, size_t olen);
+
+/* External API */
 ''')
+
+  include.write('\n/* Encode NUL-terminated string to UTF8 */\n')
+  for e in sorted(encodings):
+    name = e.replace('-', '_').lower()
+    include.write('extern int % -33s(char *output, size_t olen, const char *input);\n'%('tutf8e_string_encode_%s'%(name)))
+
+  include.write('\n/* Encode buffer to UTF8 */\n')
+  for e in sorted(encodings):
+    name = e.replace('-', '_').lower()
+    include.write('extern int % -33s(char *output, size_t olen, const char *input, size_t ilen);\n'%('tutf8e_buffer_encode_%s'%(name)))
 
   for e in sorted(encodings):
 
@@ -100,7 +113,7 @@ extern int encode_utf8(const uint16_t *table, const char *i, size_t ilen, char *
 
 #   include.write('\n/* %s */\n'%(e))
 #   include.write('extern char * encode_%s_to_utf8(const char *input);\n'%(name))
-    include.write('extern int encode_%s_utf8(char *dest, size_t size, const char *input);\n'%(name))
+#   include.write('extern int % -33s(char *output, size_t olen, const char *input);\n'%('tutf8e_string_encode_%s'%(name)))
 
     with open('src/%s.c'%(name), 'w') as src:
 
@@ -141,10 +154,16 @@ extern int encode_utf8(const uint16_t *table, const char *i, size_t ilen, char *
       # src.write('}\n')
 
       src.write('\n')
-      src.write('int encode_%s_utf8(char *dest, size_t size, const char *src)\n'%(name))
+      src.write('int tutf8e_string_encode_%s(char *output, size_t olen, const char *input)\n'%(name))
       src.write('{\n')
-      src.write('  size_t len = strlen(src) + 1;\n')
-      src.write('  return encode_utf8(%s_utf8, src, len, dest, size);\n'%(name))
+      src.write('  size_t len = strlen(input) + 1;\n')
+      src.write('  return tutf8e_buffer_encode(%s_utf8, input, len, output, olen);\n'%(name))
+      src.write('}\n')
+
+      src.write('\n')
+      src.write('int tutf8e_buffer_encode_%s(char *output, size_t olen, const char *input, size_t ilen)\n'%(name))
+      src.write('{\n')
+      src.write('  return tutf8e_buffer_encode(%s_utf8, input, ilen, output, olen);\n'%(name))
       src.write('}\n')
 
   include.write('\n')
@@ -182,6 +201,7 @@ with open('test/test.c', 'w') as test:
   test.write('  int pass = 0;\n')
   test.write('  int fail = 0;\n')
   test.write('  int ret;\n')
+  test.write('  size_t len;\n')
   test.write('  char buffer[1024];\n')
   test.write('\n')
 
@@ -205,8 +225,19 @@ with open('test/test.c', 'w') as test:
   test.write('\n')
   for i in tests:
     if i[1] in encodings:
-      test.write('  ret = encode_%s_utf8(buffer, sizeof(buffer), %s);\n'%(i[1].replace('-', '_').lower(), i[0]))
-      test.write('  if (!ret && !strcmp(buffer, %sUTF8)) { \n'%(i[0]))
+      test.write('  ret = tutf8e_string_encode_%s(buffer, sizeof(buffer), %s);\n'%(i[1].replace('-', '_').lower(), i[0]))
+      test.write('  if (!ret && !strcmp(buffer, %sUTF8)) {\n'%(i[0]))
+      test.write('    printf("%s\\n", buffer);\n')
+      test.write('    pass++;\n')
+      test.write('  } else {\n')
+      test.write('    printf("Failed to decode %s test\\n");\n'%(i[0]))
+      test.write('    fail++;\n')
+      test.write('  }\n')
+      test.write('\n')
+
+      test.write('  len = strlen(%s);\n'%(i[0]))
+      test.write('  ret = tutf8e_buffer_encode_%s(buffer, sizeof(buffer), %s, len);\n'%(i[1].replace('-', '_').lower(), i[0]))
+      test.write('  if (!ret && !strncmp(buffer, %sUTF8, len)) {\n'%(i[0]))
       test.write('    printf("%s\\n", buffer);\n')
       test.write('    pass++;\n')
       test.write('  } else {\n')

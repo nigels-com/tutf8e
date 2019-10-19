@@ -21,8 +21,13 @@ static const uint16_t iso_8859_3_utf8[256] =
   0xffff, 0x00f1, 0x00f2, 0x00f3, 0x00f4, 0x0121, 0x00f6, 0x00f7, 0x011d, 0x00f9, 0x00fa, 0x00fb, 0x00fc, 0x016d, 0x015d, 0x02d9,
 };
 
-int encode_iso_8859_3_utf8(char *dest, size_t size, const char *src)
+int tutf8e_string_encode_iso_8859_3(char *output, size_t olen, const char *input)
 {
-  size_t len = strlen(src) + 1;
-  return encode_utf8(iso_8859_3_utf8, src, len, dest, size);
+  size_t len = strlen(input) + 1;
+  return tutf8e_buffer_encode(iso_8859_3_utf8, input, len, output, olen);
+}
+
+int tutf8e_buffer_encode_iso_8859_3(char *output, size_t olen, const char *input, size_t ilen)
+{
+  return tutf8e_buffer_encode(iso_8859_3_utf8, input, ilen, output, olen);
 }
