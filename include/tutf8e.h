@@ -12,6 +12,10 @@ extern int tutf8e_buffer_encode(const uint16_t *table, const char *i, size_t ile
 
 /* External API */
 
+#define TUTF8E_OK      0 /* Success                    */
+#define TUTF8E_INVALID 1 /* Invalid input character    */
+#define TUTF8E_TOOLONG 2 /* Insufficient output buffer */
+
 /* Encode NUL-terminated string to UTF8 */
 extern int tutf8e_string_encode_iso_8859_1  (char *output, size_t olen, const char *input);
 extern int tutf8e_string_encode_iso_8859_10 (char *output, size_t olen, const char *input);
