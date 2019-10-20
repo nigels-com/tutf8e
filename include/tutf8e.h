@@ -68,6 +68,32 @@ extern char * tutf8e_string_encode_windows_1256_realloc(char *input);
 extern char * tutf8e_string_encode_windows_1257_realloc(char *input);
 extern char * tutf8e_string_encode_windows_1258_realloc(char *input);
 
+/* Buffer length as UTF8 */
+extern int tutf8e_buffer_length_iso_8859_1  (const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_iso_8859_10 (const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_iso_8859_11 (const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_iso_8859_13 (const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_iso_8859_14 (const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_iso_8859_15 (const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_iso_8859_16 (const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_iso_8859_2  (const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_iso_8859_3  (const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_iso_8859_4  (const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_iso_8859_5  (const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_iso_8859_6  (const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_iso_8859_7  (const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_iso_8859_8  (const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_iso_8859_9  (const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_windows_1250(const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_windows_1251(const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_windows_1252(const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_windows_1253(const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_windows_1254(const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_windows_1255(const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_windows_1256(const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_windows_1257(const char *i, size_t ilen, size_t *length);
+extern int tutf8e_buffer_length_windows_1258(const char *i, size_t ilen, size_t *length);
+
 /* Encode buffer to UTF8 */
 extern int tutf8e_buffer_encode_iso_8859_1  (char *output, size_t *olen, const char *input, size_t ilen);
 extern int tutf8e_buffer_encode_iso_8859_10 (char *output, size_t *olen, const char *input, size_t ilen);

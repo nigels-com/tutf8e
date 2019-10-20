@@ -29,6 +29,11 @@ int tutf8e_string_encode_windows_1253(char *output, size_t olen, const char *inp
   return tutf8e_buffer_encode(windows_1253_utf8, input, len, output, &olen);
 }
 
+int tutf8e_buffer_length_windows_1253(const char *i, size_t ilen, size_t *length)
+{
+  return tutf8e_buffer_length(windows_1253_utf8, i, ilen, length);
+}
+
 int tutf8e_buffer_encode_windows_1253(char *output, size_t *olen, const char *input, size_t ilen)
 {
   return tutf8e_buffer_encode(windows_1253_utf8, input, ilen, output, olen);

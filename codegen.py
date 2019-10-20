@@ -133,6 +133,11 @@ extern int tutf8e_buffer_encode(const uint16_t *table, const char *i, size_t ile
     name = e.replace('-', '_').lower()
     include.write('extern char * % -33s(char *input);\n'%('tutf8e_string_encode_%s_realloc'%(name)))
 
+  include.write('\n/* Buffer length as UTF8 */\n')
+  for e in sorted(encodings):
+    name = e.replace('-', '_').lower()
+    include.write('extern int % -33s(const char *i, size_t ilen, size_t *length);\n'%('tutf8e_buffer_length_%s'%(name)))
+
   include.write('\n/* Encode buffer to UTF8 */\n')
   for e in sorted(encodings):
     name = e.replace('-', '_').lower()
@@ -181,6 +186,13 @@ extern int tutf8e_buffer_encode(const uint16_t *table, const char *i, size_t ile
       src.write('  size_t len = strlen(input) + 1;\n')
       src.write('  return tutf8e_buffer_encode(%s_utf8, input, len, output, &olen);\n'%(name))
       src.write('}\n')
+
+      src.write('''
+int tutf8e_buffer_length_%s(const char *i, size_t ilen, size_t *length)
+{
+  return tutf8e_buffer_length(%s_utf8, i, ilen, length);
+}
+'''%(name, name))
 
       src.write('\n')
       src.write('int tutf8e_buffer_encode_%s(char *output, size_t *olen, const char *input, size_t ilen)\n'%(name))

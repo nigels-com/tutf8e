@@ -29,6 +29,11 @@ int tutf8e_string_encode_iso_8859_7(char *output, size_t olen, const char *input
   return tutf8e_buffer_encode(iso_8859_7_utf8, input, len, output, &olen);
 }
 
+int tutf8e_buffer_length_iso_8859_7(const char *i, size_t ilen, size_t *length)
+{
+  return tutf8e_buffer_length(iso_8859_7_utf8, i, ilen, length);
+}
+
 int tutf8e_buffer_encode_iso_8859_7(char *output, size_t *olen, const char *input, size_t ilen)
 {
   return tutf8e_buffer_encode(iso_8859_7_utf8, input, ilen, output, olen);
