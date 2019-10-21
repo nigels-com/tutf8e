@@ -227,6 +227,7 @@ int tutf8e_buffer_length_%s(const char *i, size_t ilen, size_t *length)
 
 tests = [
   ('english',  'iso-8859-1',  'A quick brown fox jumps over the lazy dog'),
+  ('finnish',  'iso-8859-1',  'Albert osti fagotin ja töräytti puhkuvan melodian.'),
   ('czech',    'iso-8859-2',  'Nechť již hříšné saxofony ďáblů rozezvučí síň úděsnými tóny waltzu, tanga a quickstepu.'),
   ('turkish',  'iso-8859-3',  'Pijamalı hasta yağız şoföre çabucak güvendi.'),
   ('estonian', 'iso-8859-4',  'Põdur Zagrebi tšellomängija-följetonist Ciqo külmetas kehvas garaažis'),
