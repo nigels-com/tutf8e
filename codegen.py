@@ -12,6 +12,8 @@ with open('src/tutf8e.c', 'w') as src:
   src.write('''
 #include <tutf8e.h>
 
+#include <string.h>
+
 /* Determine the input length and UTF8 encoded length of NUL-terminated input string */
 /* return TUTF8E_INVALID if input character is not convertable                       */
 /* return TUTF8E_OK for success                                                      */
@@ -101,6 +103,17 @@ int tutf8e_buffer_encode(const uint16_t *table, const char *input, size_t ilen, 
   return TUTF8E_OK;
 }
 ''')
+  src.write('''
+TUTF8encoder tutf8e_encoder(const char *encoding)
+{
+''')
+  for e in sorted(encodings):
+    name = e.replace('-', '_').lower()
+    src.write('  if (!strcmp(encoding, "%s")) return (TUTF8encoder) tutf8e_%s_utf8;\n'%(e, name))
+  src.write('''
+  return NULL;
+}
+''')
 
 with open('include/tutf8e.h', 'w') as include:
 
@@ -112,16 +125,44 @@ with open('include/tutf8e.h', 'w') as include:
 #include <stdint.h>  /* uint16_t */
 
 /* Internal API */
+
 extern int tutf8e_string_length(const uint16_t *table, const char *i, size_t *ilen, size_t *olen);
-extern int tutf8e_buffer_length(const uint16_t *table, const char *i, size_t ilen, size_t *length);
-extern int tutf8e_buffer_encode(const uint16_t *table, const char *i, size_t ilen, char *output, size_t *olen);
+extern int tutf8e_buffer_length(const uint16_t *table, const char *i, size_t ilen, size_t *olen);
+extern int tutf8e_buffer_encode(const uint16_t *table, const char *i, size_t ilen, char *o, size_t *olen);
 
 /* External API */
+
+typedef void *TUTF8encoder;
+
+extern TUTF8encoder tutf8e_encoder(const char *encoding);
 
 #define TUTF8E_OK      0 /* Success                    */
 #define TUTF8E_INVALID 1 /* Invalid input character    */
 #define TUTF8E_TOOLONG 2 /* Insufficient output buffer */
+
+static inline int tutf8e_encoder_string_length(const TUTF8encoder encoder, const char *i, size_t *ilen, size_t *olen)
+{
+  return tutf8e_string_length((const uint16_t *) encoder, i, ilen, olen);
+}
+
+static inline int tutf8e_encoder_buffer_length(const TUTF8encoder encoder, const char *i, size_t ilen, size_t *length)
+{
+  return tutf8e_buffer_length((const uint16_t *) encoder, i, ilen, length);
+}
+
+static inline int tutf8e_encoder_buffer_encode(const TUTF8encoder encoder, const char *i, size_t ilen, char *o, size_t *olen)
+{
+  return tutf8e_buffer_encode((const uint16_t *) encoder, i, ilen, o, olen);
+}
+
+/* Per-encoding API */
+
 ''')
+
+  include.write('\n/* UTF8 Tables */\n')
+  for e in sorted(encodings):
+    name = e.replace('-', '_').lower()
+    include.write('extern const uint16_t tutf8e_%s_utf8[256];\n'%(name))
 
   include.write('\n/* Encode NUL-terminated string to UTF8 */\n')
   for e in sorted(encodings):
@@ -174,7 +215,7 @@ extern int tutf8e_buffer_encode(const uint16_t *table, const char *i, size_t ile
           v.append(0xffff)
           pass
 
-      src.write('static const uint16_t %s_utf8[256] =\n'%(name))
+      src.write('const uint16_t tutf8e_%s_utf8[256] =\n'%(name))
       src.write('{\n')
       for i in range(0,256,16):
         src.write('  %s,\n'%(', '.join([ '0x%04x'%(i) for i in v[i:i+16]])))
@@ -184,20 +225,20 @@ extern int tutf8e_buffer_encode(const uint16_t *table, const char *i, size_t ile
       src.write('int tutf8e_string_encode_%s(char *output, size_t olen, const char *input)\n'%(name))
       src.write('{\n')
       src.write('  size_t len = strlen(input) + 1;\n')
-      src.write('  return tutf8e_buffer_encode(%s_utf8, input, len, output, &olen);\n'%(name))
+      src.write('  return tutf8e_buffer_encode(tutf8e_%s_utf8, input, len, output, &olen);\n'%(name))
       src.write('}\n')
 
       src.write('''
 int tutf8e_buffer_length_%s(const char *i, size_t ilen, size_t *length)
 {
-  return tutf8e_buffer_length(%s_utf8, i, ilen, length);
+  return tutf8e_buffer_length(tutf8e_%s_utf8, i, ilen, length);
 }
 '''%(name, name))
 
       src.write('\n')
       src.write('int tutf8e_buffer_encode_%s(char *output, size_t *olen, const char *input, size_t ilen)\n'%(name))
       src.write('{\n')
-      src.write('  return tutf8e_buffer_encode(%s_utf8, input, ilen, output, olen);\n'%(name))
+      src.write('  return tutf8e_buffer_encode(tutf8e_%s_utf8, input, ilen, output, olen);\n'%(name))
       src.write('}\n')
 
       src.write('\n')
@@ -205,9 +246,9 @@ int tutf8e_buffer_length_%s(const char *i, size_t ilen, size_t *length)
       src.write('{\n')
       src.write('  size_t ilen = 0;\n')
       src.write('  size_t olen = 0;\n')
-      src.write('  if (input && !tutf8e_string_length(%s_utf8, input, &ilen, &olen) && ilen && olen && ilen!=olen) {\n'%(name))
+      src.write('  if (input && !tutf8e_string_length(tutf8e_%s_utf8, input, &ilen, &olen) && ilen && olen && ilen!=olen) {\n'%(name))
       src.write('    char * output = malloc(olen + 1);\n')
-      src.write('    if (output && !tutf8e_buffer_encode(%s_utf8, input, ilen, output, &olen)) {\n'%(name))
+      src.write('    if (output && !tutf8e_buffer_encode(tutf8e_%s_utf8, input, ilen, output, &olen)) {\n'%(name))
       src.write('      free(input);\n')
       src.write('      output[olen] = 0;\n')
       src.write('      return output;\n')

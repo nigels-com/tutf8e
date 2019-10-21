@@ -1,6 +1,8 @@
 
 #include <tutf8e.h>
 
+#include <string.h>
+
 /* Determine the input length and UTF8 encoded length of NUL-terminated input string */
 /* return TUTF8E_INVALID if input character is not convertable                       */
 /* return TUTF8E_OK for success                                                      */
@@ -88,4 +90,34 @@ int tutf8e_buffer_encode(const uint16_t *table, const char *input, size_t ilen, 
   }
   *olen -= left;
   return TUTF8E_OK;
+}
+
+TUTF8encoder tutf8e_encoder(const char *encoding)
+{
+  if (!strcmp(encoding, "iso-8859-1")) return (TUTF8encoder) tutf8e_iso_8859_1_utf8;
+  if (!strcmp(encoding, "iso-8859-10")) return (TUTF8encoder) tutf8e_iso_8859_10_utf8;
+  if (!strcmp(encoding, "iso-8859-11")) return (TUTF8encoder) tutf8e_iso_8859_11_utf8;
+  if (!strcmp(encoding, "iso-8859-13")) return (TUTF8encoder) tutf8e_iso_8859_13_utf8;
+  if (!strcmp(encoding, "iso-8859-14")) return (TUTF8encoder) tutf8e_iso_8859_14_utf8;
+  if (!strcmp(encoding, "iso-8859-15")) return (TUTF8encoder) tutf8e_iso_8859_15_utf8;
+  if (!strcmp(encoding, "iso-8859-16")) return (TUTF8encoder) tutf8e_iso_8859_16_utf8;
+  if (!strcmp(encoding, "iso-8859-2")) return (TUTF8encoder) tutf8e_iso_8859_2_utf8;
+  if (!strcmp(encoding, "iso-8859-3")) return (TUTF8encoder) tutf8e_iso_8859_3_utf8;
+  if (!strcmp(encoding, "iso-8859-4")) return (TUTF8encoder) tutf8e_iso_8859_4_utf8;
+  if (!strcmp(encoding, "iso-8859-5")) return (TUTF8encoder) tutf8e_iso_8859_5_utf8;
+  if (!strcmp(encoding, "iso-8859-6")) return (TUTF8encoder) tutf8e_iso_8859_6_utf8;
+  if (!strcmp(encoding, "iso-8859-7")) return (TUTF8encoder) tutf8e_iso_8859_7_utf8;
+  if (!strcmp(encoding, "iso-8859-8")) return (TUTF8encoder) tutf8e_iso_8859_8_utf8;
+  if (!strcmp(encoding, "iso-8859-9")) return (TUTF8encoder) tutf8e_iso_8859_9_utf8;
+  if (!strcmp(encoding, "windows-1250")) return (TUTF8encoder) tutf8e_windows_1250_utf8;
+  if (!strcmp(encoding, "windows-1251")) return (TUTF8encoder) tutf8e_windows_1251_utf8;
+  if (!strcmp(encoding, "windows-1252")) return (TUTF8encoder) tutf8e_windows_1252_utf8;
+  if (!strcmp(encoding, "windows-1253")) return (TUTF8encoder) tutf8e_windows_1253_utf8;
+  if (!strcmp(encoding, "windows-1254")) return (TUTF8encoder) tutf8e_windows_1254_utf8;
+  if (!strcmp(encoding, "windows-1255")) return (TUTF8encoder) tutf8e_windows_1255_utf8;
+  if (!strcmp(encoding, "windows-1256")) return (TUTF8encoder) tutf8e_windows_1256_utf8;
+  if (!strcmp(encoding, "windows-1257")) return (TUTF8encoder) tutf8e_windows_1257_utf8;
+  if (!strcmp(encoding, "windows-1258")) return (TUTF8encoder) tutf8e_windows_1258_utf8;
+
+  return NULL;
 }

@@ -6,15 +6,64 @@
 #include <stdint.h>  /* uint16_t */
 
 /* Internal API */
+
 extern int tutf8e_string_length(const uint16_t *table, const char *i, size_t *ilen, size_t *olen);
-extern int tutf8e_buffer_length(const uint16_t *table, const char *i, size_t ilen, size_t *length);
-extern int tutf8e_buffer_encode(const uint16_t *table, const char *i, size_t ilen, char *output, size_t *olen);
+extern int tutf8e_buffer_length(const uint16_t *table, const char *i, size_t ilen, size_t *olen);
+extern int tutf8e_buffer_encode(const uint16_t *table, const char *i, size_t ilen, char *o, size_t *olen);
 
 /* External API */
+
+typedef void *TUTF8encoder;
+
+extern TUTF8encoder tutf8e_encoder(const char *encoding);
 
 #define TUTF8E_OK      0 /* Success                    */
 #define TUTF8E_INVALID 1 /* Invalid input character    */
 #define TUTF8E_TOOLONG 2 /* Insufficient output buffer */
+
+static inline int tutf8e_encoder_string_length(const TUTF8encoder encoder, const char *i, size_t *ilen, size_t *olen)
+{
+  return tutf8e_string_length((const uint16_t *) encoder, i, ilen, olen);
+}
+
+static inline int tutf8e_encoder_buffer_length(const TUTF8encoder encoder, const char *i, size_t ilen, size_t *length)
+{
+  return tutf8e_buffer_length((const uint16_t *) encoder, i, ilen, length);
+}
+
+static inline int tutf8e_encoder_buffer_encode(const TUTF8encoder encoder, const char *i, size_t ilen, char *o, size_t *olen)
+{
+  return tutf8e_buffer_encode((const uint16_t *) encoder, i, ilen, o, olen);
+}
+
+/* Per-encoding API */
+
+
+/* UTF8 Tables */
+extern const uint16_t tutf8e_iso_8859_1_utf8[256];
+extern const uint16_t tutf8e_iso_8859_10_utf8[256];
+extern const uint16_t tutf8e_iso_8859_11_utf8[256];
+extern const uint16_t tutf8e_iso_8859_13_utf8[256];
+extern const uint16_t tutf8e_iso_8859_14_utf8[256];
+extern const uint16_t tutf8e_iso_8859_15_utf8[256];
+extern const uint16_t tutf8e_iso_8859_16_utf8[256];
+extern const uint16_t tutf8e_iso_8859_2_utf8[256];
+extern const uint16_t tutf8e_iso_8859_3_utf8[256];
+extern const uint16_t tutf8e_iso_8859_4_utf8[256];
+extern const uint16_t tutf8e_iso_8859_5_utf8[256];
+extern const uint16_t tutf8e_iso_8859_6_utf8[256];
+extern const uint16_t tutf8e_iso_8859_7_utf8[256];
+extern const uint16_t tutf8e_iso_8859_8_utf8[256];
+extern const uint16_t tutf8e_iso_8859_9_utf8[256];
+extern const uint16_t tutf8e_windows_1250_utf8[256];
+extern const uint16_t tutf8e_windows_1251_utf8[256];
+extern const uint16_t tutf8e_windows_1252_utf8[256];
+extern const uint16_t tutf8e_windows_1253_utf8[256];
+extern const uint16_t tutf8e_windows_1254_utf8[256];
+extern const uint16_t tutf8e_windows_1255_utf8[256];
+extern const uint16_t tutf8e_windows_1256_utf8[256];
+extern const uint16_t tutf8e_windows_1257_utf8[256];
+extern const uint16_t tutf8e_windows_1258_utf8[256];
 
 /* Encode NUL-terminated string to UTF8 */
 extern int tutf8e_string_encode_iso_8859_1  (char *output, size_t olen, const char *input);
