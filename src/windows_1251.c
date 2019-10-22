@@ -1,9 +1,6 @@
 #include <tutf8e.h>
 
-#include <string.h> /* strlen */
-#include <stdlib.h> /* malloc/free */
-
-const uint16_t tutf8e_windows_1251_utf8[256] =
+static const uint16_t tutf8e_windows_1251_utf8[256] =
 {
   0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000a, 0x000b, 0x000c, 0x000d, 0x000e, 0x000f,
   0x0010, 0x0011, 0x0012, 0x0013, 0x0014, 0x0015, 0x0016, 0x0017, 0x0018, 0x0019, 0x001a, 0x001b, 0x001c, 0x001d, 0x001e, 0x001f,
@@ -23,34 +20,4 @@ const uint16_t tutf8e_windows_1251_utf8[256] =
   0x0440, 0x0441, 0x0442, 0x0443, 0x0444, 0x0445, 0x0446, 0x0447, 0x0448, 0x0449, 0x044a, 0x044b, 0x044c, 0x044d, 0x044e, 0x044f,
 };
 
-int tutf8e_string_encode_windows_1251(char *output, size_t olen, const char *input)
-{
-  size_t len = strlen(input) + 1;
-  return tutf8e_buffer_encode(tutf8e_windows_1251_utf8, input, len, output, &olen);
-}
-
-int tutf8e_buffer_length_windows_1251(const char *i, size_t ilen, size_t *length)
-{
-  return tutf8e_buffer_length(tutf8e_windows_1251_utf8, i, ilen, length);
-}
-
-int tutf8e_buffer_encode_windows_1251(char *output, size_t *olen, const char *input, size_t ilen)
-{
-  return tutf8e_buffer_encode(tutf8e_windows_1251_utf8, input, ilen, output, olen);
-}
-
-char * tutf8e_string_encode_windows_1251_realloc(char *input)
-{
-  size_t ilen = 0;
-  size_t olen = 0;
-  if (input && !tutf8e_string_length(tutf8e_windows_1251_utf8, input, &ilen, &olen) && ilen && olen && ilen!=olen) {
-    char * output = malloc(olen + 1);
-    if (output && !tutf8e_buffer_encode(tutf8e_windows_1251_utf8, input, ilen, output, &olen)) {
-      free(input);
-      output[olen] = 0;
-      return output;
-    }
-    free(output);
-  }
-  return input;
-}
+const TUTF8encoder tutf8e_encoder_windows_1251 = (TUTF8encoder) tutf8e_windows_1251_utf8;
