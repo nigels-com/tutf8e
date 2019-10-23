@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
 encodings = [
-  'windows-1250', 'windows-1251', 'windows-1252', 'windows-1253', 'windows-1254',
-  'windows-1255',  'windows-1256', 'windows-1257', 'windows-1258',
-  'iso-8859-1', 'iso-8859-2', 'iso-8859-3', 'iso-8859-4', 'iso-8859-5', 'iso-8859-6', 'iso-8859-7', 'iso-8859-8', 'iso-8859-9', 'iso-8859-10',
-  'iso-8859-11', 'iso-8859-13', 'iso-8859-14', 'iso-8859-15', 'iso-8859-16'
-  ]
+  'windows-1250', 'windows-1251', 'windows-1252',
+  'windows-1253', 'windows-1254', 'windows-1255',
+  'windows-1256', 'windows-1257', 'windows-1258',
+  'iso-8859-1', 'iso-8859-2',  'iso-8859-3',  'iso-8859-4',
+  'iso-8859-5', 'iso-8859-6',  'iso-8859-7',  'iso-8859-8',
+  'iso-8859-9', 'iso-8859-10', 'iso-8859-11', 'iso-8859-13',
+  'iso-8859-14', 'iso-8859-15', 'iso-8859-16'
+]
 
 with open('include/tutf8e.h', 'w') as include:
 
@@ -60,31 +63,6 @@ static inline int tutf8e_encoder_buffer_encode(const TUTF8encoder encoder, const
   for e in sorted(encodings):
     name = e.replace('-', '_').lower()
     include.write('extern const TUTF8encoder tutf8e_encoder_%s;\n'%(name))
-
-  # include.write('\n/* UTF8 Tables */\n')
-  # for e in sorted(encodings):
-  #   name = e.replace('-', '_').lower()
-  #   include.write('extern const uint16_t tutf8e_%s_utf8[256];\n'%(name))
-
-  # include.write('\n/* Encode NUL-terminated string to UTF8 */\n')
-  # for e in sorted(encodings):
-  #   name = e.replace('-', '_').lower()
-  #   include.write('extern int % -33s(char *output, size_t olen, const char *input);\n'%('tutf8e_string_encode_%s'%(name)))
-
-  # include.write('\n/* Encode NUL-terminated string to UTF8, realloc as necessary */\n')
-  # for e in sorted(encodings):
-  #   name = e.replace('-', '_').lower()
-  #   include.write('extern char * % -33s(char *input);\n'%('tutf8e_string_encode_%s_realloc'%(name)))
-
-  # include.write('\n/* Buffer length as UTF8 */\n')
-  # for e in sorted(encodings):
-  #   name = e.replace('-', '_').lower()
-  #   include.write('extern int % -33s(const char *i, size_t ilen, size_t *length);\n'%('tutf8e_buffer_length_%s'%(name)))
-
-  # include.write('\n/* Encode buffer to UTF8 */\n')
-  # for e in sorted(encodings):
-  #   name = e.replace('-', '_').lower()
-  #   include.write('extern int % -33s(char *output, size_t *olen, const char *input, size_t ilen);\n'%('tutf8e_buffer_encode_%s'%(name)))
 
   include.write('\n')
   include.write('#endif\n')
@@ -208,6 +186,34 @@ int tutf8e_buffer_encode(const uint16_t *table, const char *input, size_t ilen, 
   return TUTF8E_OK;
 }
 ''')
+
+  for e in sorted(encodings):
+
+    mapping  = {}
+    domain   = []
+
+    name = e.replace('-', '_').lower()
+
+    v = []
+    for i in range(0,256):
+      try:
+        v.append(ord(bytes([i]).decode(e)[0]))
+      except:
+        v.append(0xffff)
+        pass
+
+    src.write('\n')
+    src.write('const uint16_t tutf8e_%s_utf8[256] =\n'%(name))
+    src.write('{\n')
+    for i in range(0,256,16):
+      src.write('  %s,\n'%(', '.join([ '0x%04x'%(i) for i in v[i:i+16]])))
+    src.write('};\n')
+
+  src.write('\n')
+  for e in sorted(encodings):
+    name = e.replace('-', '_').lower()
+    src.write('const TUTF8encoder tutf8e_encoder_%s = (TUTF8encoder) tutf8e_%s_utf8;\n'%(name, name))
+
   src.write('''
 TUTF8encoder tutf8e_encoder(const char *encoding)
 {
@@ -220,16 +226,12 @@ TUTF8encoder tutf8e_encoder(const char *encoding)
 }
 ''')
 
-
 for e in sorted(encodings):
 
   mapping  = {}
   domain   = []
 
   name = e.replace('-', '_').lower()
-
-  print('Encoding: %s'%(e))
-
   with open('include/tutf8e/%s.h'%(name), 'w') as include:
 
     include.write('''
@@ -269,74 +271,6 @@ static inline int tutf8e_%s_buffer_encode(const char *i, size_t ilen, char *o, s
 
     include.write('\n')
     include.write('#endif\n')
-
-#   include.write('\n/* %s */\n'%(e))
-#   include.write('extern char * encode_%s_to_utf8(const char *input);\n'%(name))
-#   include.write('extern int % -33s(char *output, size_t olen, const char *input);\n'%('tutf8e_string_encode_%s'%(name)))
-
-  with open('src/%s.c'%(name), 'w') as src:
-
-    # Emit code
-
-    src.write('#include <tutf8e.h>\n')
-    src.write('\n')
-    # src.write('#include <string.h> /* strlen */\n')
-    # src.write('#include <stdlib.h> /* malloc/free */\n')
-    # src.write('\n')
-
-    v = []
-    for i in range(0,256):
-      try:
-        v.append(ord(bytes([i]).decode(e)[0]))
-      except:
-        v.append(0xffff)
-        pass
-
-    src.write('static const uint16_t tutf8e_%s_utf8[256] =\n'%(name))
-    src.write('{\n')
-    for i in range(0,256,16):
-      src.write('  %s,\n'%(', '.join([ '0x%04x'%(i) for i in v[i:i+16]])))
-    src.write('};\n')
-
-    src.write('\n')
-    src.write('const TUTF8encoder tutf8e_encoder_%s = (TUTF8encoder) tutf8e_%s_utf8;\n'%(name, name))
-
-#     src.write('\n')
-#     src.write('int tutf8e_string_encode_%s(char *output, size_t olen, const char *input)\n'%(name))
-#     src.write('{\n')
-#     src.write('  size_t len = strlen(input) + 1;\n')
-#     src.write('  return tutf8e_buffer_encode(tutf8e_%s_utf8, input, len, output, &olen);\n'%(name))
-#     src.write('}\n')
-
-#     src.write('''
-# int tutf8e_buffer_length_%s(const char *i, size_t ilen, size_t *length)
-# {
-# return tutf8e_buffer_length(tutf8e_%s_utf8, i, ilen, length);
-# }
-# '''%(name, name))
-
-#     src.write('\n')
-#     src.write('int tutf8e_buffer_encode_%s(char *output, size_t *olen, const char *input, size_t ilen)\n'%(name))
-#     src.write('{\n')
-#     src.write('  return tutf8e_buffer_encode(tutf8e_%s_utf8, input, ilen, output, olen);\n'%(name))
-#     src.write('}\n')
-
-#     src.write('\n')
-#     src.write('char * tutf8e_string_encode_%s_realloc(char *input)\n'%(name))
-#     src.write('{\n')
-#     src.write('  size_t ilen = 0;\n')
-#     src.write('  size_t olen = 0;\n')
-#     src.write('  if (input && !tutf8e_string_length(tutf8e_%s_utf8, input, &ilen, &olen) && ilen && olen && ilen!=olen) {\n'%(name))
-#     src.write('    char * output = malloc(olen + 1);\n')
-#     src.write('    if (output && !tutf8e_buffer_encode(tutf8e_%s_utf8, input, ilen, output, &olen)) {\n'%(name))
-#     src.write('      free(input);\n')
-#     src.write('      output[olen] = 0;\n')
-#     src.write('      return output;\n')
-#     src.write('    }\n')
-#     src.write('    free(output);\n')
-#     src.write('  }\n')
-#     src.write('  return input;\n')
-#     src.write('}\n')
 
 # TESTS
 
@@ -427,21 +361,6 @@ with open('test/test.c', 'w') as test:
       test.write('    fail++;\n')
       test.write('  }\n')
       test.write('\n')
-
-  # test.write('\n  /* string encode with possible re-allocation to UTF8 */\n')
-  # for i in tests:
-  #   if i[1] in encodings:
-  #     name = i[1].replace('-', '_').lower()
-  #     test.write('  encoded = tutf8e_string_encode_%s_realloc(strdup(%s));\n'%(name, i[0]))
-  #     test.write('  if (encoded && !strcmp(encoded, %sUTF8)) {\n'%(i[0]))
-  #     test.write('    printf("%s\\n", encoded);\n')
-  #     test.write('    pass++;\n')
-  #     test.write('  } else {\n')
-  #     test.write('    printf("Failed to encode %s test\\n");\n'%(i[0]))
-  #     test.write('    fail++;\n')
-  #     test.write('  }\n')
-  #     test.write('  free(encoded);\n')
-  #     test.write('\n')
 
   test.write('  printf("%d passed, %d failed tests\\n", pass, fail);\n')
 
