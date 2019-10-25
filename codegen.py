@@ -296,10 +296,10 @@ with open('test/test.c', 'w') as test:
 
   test.write('#include <tutf8e.h>\n')
   test.write('\n')
-  for e in sorted(encodings):
-    name = e.replace('-', '_').lower()
-    test.write('#include <tutf8e/%s.h>\n'%(name))
-  test.write('\n')
+  # for e in sorted(encodings):
+  #   name = e.replace('-', '_').lower()
+  #   test.write('#include <tutf8e/%s.h>\n'%(name))
+  # test.write('\n')
 
   test.write('#include <stdio.h>\n')
   test.write('#include <string.h>\n')
@@ -337,7 +337,7 @@ with open('test/test.c', 'w') as test:
     if i[1] in encodings:
       name = i[1].replace('-', '_').lower()
       test.write('  olen = sizeof(buffer);\n')
-      test.write('  ret = tutf8e_%s_string_encode(%s, buffer, &olen);\n'%(name, i[0]))
+      test.write('  ret = tutf8e_encoder_string_encode(tutf8e_encoder_%s, %s, buffer, &olen);\n'%(name, i[0]))
       test.write('  if (!ret && !strcmp(buffer, %sUTF8)) {\n'%(i[0]))
       test.write('    printf("%s\\n", buffer);\n')
       test.write('    pass++;\n')
@@ -353,7 +353,7 @@ with open('test/test.c', 'w') as test:
       name = i[1].replace('-', '_').lower()
       test.write('  ilen = strlen(%s);\n'%(i[0]))
       test.write('  olen = sizeof(buffer);\n')
-      test.write('  ret = tutf8e_%s_buffer_encode(%s, ilen, buffer, &olen);\n'%(name, i[0]))
+      test.write('  ret = tutf8e_encoder_buffer_encode(tutf8e_encoder_%s, %s, ilen, buffer, &olen);\n'%(name, i[0]))
       test.write('  if (!ret && (olen+1)==sizeof(%sUTF8) && !strncmp(buffer, %sUTF8, olen)) {\n'%(i[0], i[0]))
       test.write('    pass++;\n')
       test.write('  } else {\n')

@@ -1,30 +1,5 @@
 #include <tutf8e.h>
 
-#include <tutf8e/iso_8859_1.h>
-#include <tutf8e/iso_8859_10.h>
-#include <tutf8e/iso_8859_11.h>
-#include <tutf8e/iso_8859_13.h>
-#include <tutf8e/iso_8859_14.h>
-#include <tutf8e/iso_8859_15.h>
-#include <tutf8e/iso_8859_16.h>
-#include <tutf8e/iso_8859_2.h>
-#include <tutf8e/iso_8859_3.h>
-#include <tutf8e/iso_8859_4.h>
-#include <tutf8e/iso_8859_5.h>
-#include <tutf8e/iso_8859_6.h>
-#include <tutf8e/iso_8859_7.h>
-#include <tutf8e/iso_8859_8.h>
-#include <tutf8e/iso_8859_9.h>
-#include <tutf8e/windows_1250.h>
-#include <tutf8e/windows_1251.h>
-#include <tutf8e/windows_1252.h>
-#include <tutf8e/windows_1253.h>
-#include <tutf8e/windows_1254.h>
-#include <tutf8e/windows_1255.h>
-#include <tutf8e/windows_1256.h>
-#include <tutf8e/windows_1257.h>
-#include <tutf8e/windows_1258.h>
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -193,7 +168,7 @@ int main(int argc, char *argv[])
 
   /* string encode to UTF8 */
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_1_string_encode(english, buffer, &olen);
+  ret = tutf8e_encoder_string_encode(tutf8e_encoder_iso_8859_1, english, buffer, &olen);
   if (!ret && !strcmp(buffer, englishUTF8)) {
     printf("%s\n", buffer);
     pass++;
@@ -203,7 +178,7 @@ int main(int argc, char *argv[])
   }
 
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_1_string_encode(finnish, buffer, &olen);
+  ret = tutf8e_encoder_string_encode(tutf8e_encoder_iso_8859_1, finnish, buffer, &olen);
   if (!ret && !strcmp(buffer, finnishUTF8)) {
     printf("%s\n", buffer);
     pass++;
@@ -213,7 +188,7 @@ int main(int argc, char *argv[])
   }
 
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_2_string_encode(czech, buffer, &olen);
+  ret = tutf8e_encoder_string_encode(tutf8e_encoder_iso_8859_2, czech, buffer, &olen);
   if (!ret && !strcmp(buffer, czechUTF8)) {
     printf("%s\n", buffer);
     pass++;
@@ -223,7 +198,7 @@ int main(int argc, char *argv[])
   }
 
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_3_string_encode(turkish, buffer, &olen);
+  ret = tutf8e_encoder_string_encode(tutf8e_encoder_iso_8859_3, turkish, buffer, &olen);
   if (!ret && !strcmp(buffer, turkishUTF8)) {
     printf("%s\n", buffer);
     pass++;
@@ -233,7 +208,7 @@ int main(int argc, char *argv[])
   }
 
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_4_string_encode(estonian, buffer, &olen);
+  ret = tutf8e_encoder_string_encode(tutf8e_encoder_iso_8859_4, estonian, buffer, &olen);
   if (!ret && !strcmp(buffer, estonianUTF8)) {
     printf("%s\n", buffer);
     pass++;
@@ -243,7 +218,7 @@ int main(int argc, char *argv[])
   }
 
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_5_string_encode(russian, buffer, &olen);
+  ret = tutf8e_encoder_string_encode(tutf8e_encoder_iso_8859_5, russian, buffer, &olen);
   if (!ret && !strcmp(buffer, russianUTF8)) {
     printf("%s\n", buffer);
     pass++;
@@ -253,7 +228,7 @@ int main(int argc, char *argv[])
   }
 
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_7_string_encode(greek, buffer, &olen);
+  ret = tutf8e_encoder_string_encode(tutf8e_encoder_iso_8859_7, greek, buffer, &olen);
   if (!ret && !strcmp(buffer, greekUTF8)) {
     printf("%s\n", buffer);
     pass++;
@@ -263,7 +238,7 @@ int main(int argc, char *argv[])
   }
 
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_8_string_encode(hebrew, buffer, &olen);
+  ret = tutf8e_encoder_string_encode(tutf8e_encoder_iso_8859_8, hebrew, buffer, &olen);
   if (!ret && !strcmp(buffer, hebrewUTF8)) {
     printf("%s\n", buffer);
     pass++;
@@ -273,7 +248,7 @@ int main(int argc, char *argv[])
   }
 
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_9_string_encode(turkish2, buffer, &olen);
+  ret = tutf8e_encoder_string_encode(tutf8e_encoder_iso_8859_9, turkish2, buffer, &olen);
   if (!ret && !strcmp(buffer, turkish2UTF8)) {
     printf("%s\n", buffer);
     pass++;
@@ -283,7 +258,7 @@ int main(int argc, char *argv[])
   }
 
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_10_string_encode(swedish, buffer, &olen);
+  ret = tutf8e_encoder_string_encode(tutf8e_encoder_iso_8859_10, swedish, buffer, &olen);
   if (!ret && !strcmp(buffer, swedishUTF8)) {
     printf("%s\n", buffer);
     pass++;
@@ -293,7 +268,7 @@ int main(int argc, char *argv[])
   }
 
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_11_string_encode(thai, buffer, &olen);
+  ret = tutf8e_encoder_string_encode(tutf8e_encoder_iso_8859_11, thai, buffer, &olen);
   if (!ret && !strcmp(buffer, thaiUTF8)) {
     printf("%s\n", buffer);
     pass++;
@@ -303,7 +278,7 @@ int main(int argc, char *argv[])
   }
 
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_13_string_encode(polish, buffer, &olen);
+  ret = tutf8e_encoder_string_encode(tutf8e_encoder_iso_8859_13, polish, buffer, &olen);
   if (!ret && !strcmp(buffer, polishUTF8)) {
     printf("%s\n", buffer);
     pass++;
@@ -316,7 +291,7 @@ int main(int argc, char *argv[])
   /* buffer encode to UTF8 */
   ilen = strlen(english);
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_1_buffer_encode(english, ilen, buffer, &olen);
+  ret = tutf8e_encoder_buffer_encode(tutf8e_encoder_iso_8859_1, english, ilen, buffer, &olen);
   if (!ret && (olen+1)==sizeof(englishUTF8) && !strncmp(buffer, englishUTF8, olen)) {
     pass++;
   } else {
@@ -326,7 +301,7 @@ int main(int argc, char *argv[])
 
   ilen = strlen(finnish);
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_1_buffer_encode(finnish, ilen, buffer, &olen);
+  ret = tutf8e_encoder_buffer_encode(tutf8e_encoder_iso_8859_1, finnish, ilen, buffer, &olen);
   if (!ret && (olen+1)==sizeof(finnishUTF8) && !strncmp(buffer, finnishUTF8, olen)) {
     pass++;
   } else {
@@ -336,7 +311,7 @@ int main(int argc, char *argv[])
 
   ilen = strlen(czech);
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_2_buffer_encode(czech, ilen, buffer, &olen);
+  ret = tutf8e_encoder_buffer_encode(tutf8e_encoder_iso_8859_2, czech, ilen, buffer, &olen);
   if (!ret && (olen+1)==sizeof(czechUTF8) && !strncmp(buffer, czechUTF8, olen)) {
     pass++;
   } else {
@@ -346,7 +321,7 @@ int main(int argc, char *argv[])
 
   ilen = strlen(turkish);
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_3_buffer_encode(turkish, ilen, buffer, &olen);
+  ret = tutf8e_encoder_buffer_encode(tutf8e_encoder_iso_8859_3, turkish, ilen, buffer, &olen);
   if (!ret && (olen+1)==sizeof(turkishUTF8) && !strncmp(buffer, turkishUTF8, olen)) {
     pass++;
   } else {
@@ -356,7 +331,7 @@ int main(int argc, char *argv[])
 
   ilen = strlen(estonian);
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_4_buffer_encode(estonian, ilen, buffer, &olen);
+  ret = tutf8e_encoder_buffer_encode(tutf8e_encoder_iso_8859_4, estonian, ilen, buffer, &olen);
   if (!ret && (olen+1)==sizeof(estonianUTF8) && !strncmp(buffer, estonianUTF8, olen)) {
     pass++;
   } else {
@@ -366,7 +341,7 @@ int main(int argc, char *argv[])
 
   ilen = strlen(russian);
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_5_buffer_encode(russian, ilen, buffer, &olen);
+  ret = tutf8e_encoder_buffer_encode(tutf8e_encoder_iso_8859_5, russian, ilen, buffer, &olen);
   if (!ret && (olen+1)==sizeof(russianUTF8) && !strncmp(buffer, russianUTF8, olen)) {
     pass++;
   } else {
@@ -376,7 +351,7 @@ int main(int argc, char *argv[])
 
   ilen = strlen(greek);
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_7_buffer_encode(greek, ilen, buffer, &olen);
+  ret = tutf8e_encoder_buffer_encode(tutf8e_encoder_iso_8859_7, greek, ilen, buffer, &olen);
   if (!ret && (olen+1)==sizeof(greekUTF8) && !strncmp(buffer, greekUTF8, olen)) {
     pass++;
   } else {
@@ -386,7 +361,7 @@ int main(int argc, char *argv[])
 
   ilen = strlen(hebrew);
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_8_buffer_encode(hebrew, ilen, buffer, &olen);
+  ret = tutf8e_encoder_buffer_encode(tutf8e_encoder_iso_8859_8, hebrew, ilen, buffer, &olen);
   if (!ret && (olen+1)==sizeof(hebrewUTF8) && !strncmp(buffer, hebrewUTF8, olen)) {
     pass++;
   } else {
@@ -396,7 +371,7 @@ int main(int argc, char *argv[])
 
   ilen = strlen(turkish2);
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_9_buffer_encode(turkish2, ilen, buffer, &olen);
+  ret = tutf8e_encoder_buffer_encode(tutf8e_encoder_iso_8859_9, turkish2, ilen, buffer, &olen);
   if (!ret && (olen+1)==sizeof(turkish2UTF8) && !strncmp(buffer, turkish2UTF8, olen)) {
     pass++;
   } else {
@@ -406,7 +381,7 @@ int main(int argc, char *argv[])
 
   ilen = strlen(swedish);
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_10_buffer_encode(swedish, ilen, buffer, &olen);
+  ret = tutf8e_encoder_buffer_encode(tutf8e_encoder_iso_8859_10, swedish, ilen, buffer, &olen);
   if (!ret && (olen+1)==sizeof(swedishUTF8) && !strncmp(buffer, swedishUTF8, olen)) {
     pass++;
   } else {
@@ -416,7 +391,7 @@ int main(int argc, char *argv[])
 
   ilen = strlen(thai);
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_11_buffer_encode(thai, ilen, buffer, &olen);
+  ret = tutf8e_encoder_buffer_encode(tutf8e_encoder_iso_8859_11, thai, ilen, buffer, &olen);
   if (!ret && (olen+1)==sizeof(thaiUTF8) && !strncmp(buffer, thaiUTF8, olen)) {
     pass++;
   } else {
@@ -426,7 +401,7 @@ int main(int argc, char *argv[])
 
   ilen = strlen(polish);
   olen = sizeof(buffer);
-  ret = tutf8e_iso_8859_13_buffer_encode(polish, ilen, buffer, &olen);
+  ret = tutf8e_encoder_buffer_encode(tutf8e_encoder_iso_8859_13, polish, ilen, buffer, &olen);
   if (!ret && (olen+1)==sizeof(polishUTF8) && !strncmp(buffer, polishUTF8, olen)) {
     pass++;
   } else {
