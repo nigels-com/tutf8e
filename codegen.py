@@ -394,7 +394,6 @@ with open('test/test.c', 'w') as test:
   test.write('#include <stdio.h>\n')
   test.write('#include <string.h>\n')
   test.write('#include <stdlib.h>\n')
-  test.write('#include <memory.h>\n')
   test.write('\n')
   test.write('int main(int argc, char *argv[])\n')
   test.write('{\n')
