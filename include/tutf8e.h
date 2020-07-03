@@ -9,12 +9,12 @@
 
 /* NUL-terminated C-string API */
 
-extern int tutf8e_string_length(const uint16_t *table, const char *input, size_t *input_length, size_t *output_length, size_t *invalid_count);
+extern int tutf8e_string_length(const uint16_t *table, const char *input, const char *invalid, size_t *input_length, size_t *output_length);
 extern int tutf8e_string_encode(const uint16_t *table, const char *input, const char *invalid, char *output, size_t *output_length);
 
 /* Known-length buffer API */
 
-extern int tutf8e_buffer_length(const uint16_t *table, const char *input, size_t input_length, size_t *output_length, size_t *invalid_count);
+extern int tutf8e_buffer_length(const uint16_t *table, const char *input, size_t input_length, const char *invalid, size_t *output_length);
 extern int tutf8e_buffer_encode(const uint16_t *table, const char *input, size_t input_length, const char *invalid, char *output, size_t *output_length);
 
 /*************** Public API ***************/
@@ -43,9 +43,9 @@ extern TUTF8encoder tutf8e_encoder(const char *encoding);
  * - TUTF8E_OK for success
  */
 
-static inline int tutf8e_encoder_string_length(const TUTF8encoder encoder, const char *input, size_t *input_length, size_t *output_length, size_t *invalid_count)
+static inline int tutf8e_encoder_string_length(const TUTF8encoder encoder, const char *input, const char *invalid, size_t *input_length, size_t *output_length)
 {
-  return tutf8e_string_length((const uint16_t *) encoder, input, input_length, output_length, invalid_count);
+  return tutf8e_string_length((const uint16_t *) encoder, input, invalid, input_length, output_length);
 }
 
 /*
@@ -82,9 +82,9 @@ static inline int tutf8e_encoder_string_encode(const TUTF8encoder encoder, const
  * - TUTF8E_OK for success
  */
 
-static inline int tutf8e_encoder_buffer_length(const TUTF8encoder encoder, const char *input, size_t input_length, size_t *length, size_t *invalid_count)
+static inline int tutf8e_encoder_buffer_length(const TUTF8encoder encoder, const char *input, const char *invalid, size_t input_length, size_t *length)
 {
-  return tutf8e_buffer_length((const uint16_t *) encoder, input, input_length, length, invalid_count);
+  return tutf8e_buffer_length((const uint16_t *) encoder, input, input_length, invalid, length);
 }
 
 /*

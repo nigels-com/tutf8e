@@ -23,12 +23,12 @@ with open('include/tutf8e.h', 'w') as include:
 
 /* NUL-terminated C-string API */
 
-extern int tutf8e_string_length(const uint16_t *table, const char *input, size_t *input_length, size_t *output_length, size_t *invalid_count);
+extern int tutf8e_string_length(const uint16_t *table, const char *input, const char *invalid, size_t *input_length, size_t *output_length);
 extern int tutf8e_string_encode(const uint16_t *table, const char *input, const char *invalid, char *output, size_t *output_length);
 
 /* Known-length buffer API */
 
-extern int tutf8e_buffer_length(const uint16_t *table, const char *input, size_t input_length, size_t *output_length, size_t *invalid_count);
+extern int tutf8e_buffer_length(const uint16_t *table, const char *input, size_t input_length, const char *invalid, size_t *output_length);
 extern int tutf8e_buffer_encode(const uint16_t *table, const char *input, size_t input_length, const char *invalid, char *output, size_t *output_length);
 
 /*************** Public API ***************/
@@ -57,9 +57,9 @@ extern TUTF8encoder tutf8e_encoder(const char *encoding);
  * - TUTF8E_OK for success
  */
 
-static inline int tutf8e_encoder_string_length(const TUTF8encoder encoder, const char *input, size_t *input_length, size_t *output_length, size_t *invalid_count)
+static inline int tutf8e_encoder_string_length(const TUTF8encoder encoder, const char *input, const char *invalid, size_t *input_length, size_t *output_length)
 {
-  return tutf8e_string_length((const uint16_t *) encoder, input, input_length, output_length, invalid_count);
+  return tutf8e_string_length((const uint16_t *) encoder, input, invalid, input_length, output_length);
 }
 
 /*
@@ -96,9 +96,9 @@ static inline int tutf8e_encoder_string_encode(const TUTF8encoder encoder, const
  * - TUTF8E_OK for success
  */
 
-static inline int tutf8e_encoder_buffer_length(const TUTF8encoder encoder, const char *input, size_t input_length, size_t *length, size_t *invalid_count)
+static inline int tutf8e_encoder_buffer_length(const TUTF8encoder encoder, const char *input, const char *invalid, size_t input_length, size_t *length)
 {
-  return tutf8e_buffer_length((const uint16_t *) encoder, input, input_length, length, invalid_count);
+  return tutf8e_buffer_length((const uint16_t *) encoder, input, input_length, invalid, length);
 }
 
 /*
@@ -139,8 +139,10 @@ with open('src/tutf8e.c', 'w') as src:
 
 #include <string.h>
 
-int tutf8e_string_length(const uint16_t *table, const char *input, size_t *input_length, size_t *output_length, size_t *invalid_count)
+int tutf8e_string_length(const uint16_t *table, const char *input, const char *invalid, size_t *input_length, size_t *output_length)
 {
+  const size_t invalid_length = invalid ? strlen(invalid) : 0;
+
   const unsigned char *i;
   for (i = (const unsigned char *) input; *i; ++i, (*input_length)++) {
     const uint16_t c = table[*i];
@@ -156,8 +158,8 @@ int tutf8e_string_length(const uint16_t *table, const char *input, size_t *input
       *output_length += 3;
       continue;
     }
-    if (invalid_count) {
-      *invalid_count += 1;
+    if (invalid) {
+      *output_length += invalid_length;
     }
     else {
       return TUTF8E_INVALID;
@@ -171,11 +173,9 @@ int tutf8e_string_encode(const uint16_t *table, const char *input, const char *i
   int ret;
   size_t input_length = 0;
   size_t encoded_length = 0;
-  size_t invalid_count = 0;
-  size_t invalid_length = invalid ? strlen(invalid) : 0;
-  if (!(ret = tutf8e_string_length(table, input, &input_length, &encoded_length, &invalid_count)))
+  if (!(ret = tutf8e_string_length(table, input, invalid, &input_length, &encoded_length)))
   {
-    if (encoded_length+invalid_count*invalid_length+1 > *output_length) return TUTF8E_TOOLONG;
+    if (encoded_length+1 > *output_length) return TUTF8E_TOOLONG;
     if (!(ret = tutf8e_buffer_encode(table, input, input_length, invalid, output, output_length)))
     {
       output[encoded_length] = 0;
@@ -190,10 +190,12 @@ int tutf8e_buffer_length
   const uint16_t *table,
   const char *input,
   size_t input_length,
-  size_t *length,
-  size_t *invalid_count
+  const char *invalid,
+  size_t *length
 )
 {
+  const size_t invalid_length = invalid ? strlen(invalid) : 0;
+
   const unsigned char *i;
   for (i = (const unsigned char *) input; input_length; ++i, --input_length) {
     const uint16_t c = table[*i];
@@ -209,8 +211,8 @@ int tutf8e_buffer_length
       *length += 3;
       continue;
     }
-    if (invalid_count) {
-      *invalid_count += 1;
+    if (invalid) {
+      *length += invalid_length;
     }
     else {
       return TUTF8E_INVALID;
@@ -229,10 +231,11 @@ int tutf8e_buffer_encode
   size_t *output_length
 )
 {
+  size_t invalid_length = invalid ? strlen(invalid) : 0;
+
   size_t left = *output_length;
   unsigned char *o = (unsigned char *) output;
   const unsigned char *i;
-  size_t invalid_length = invalid ? strlen(invalid) : 0;
   for (i = (const unsigned char *) input; input_length; ++i, --input_length) {
     const uint16_t c = table[*i];
     if (c<0x80) {
@@ -329,30 +332,30 @@ for e in sorted(encodings):
 '''%(name.upper(), name.upper()))
 
     include.write('''
-static inline int tutf8e_%s_string_length(const char *input, size_t *input_length, size_t *output_length)
+static inline int tutf8e_%s_string_length(const char *input, size_t *input_length, const char *invalid, size_t *output_length)
 {
-  return tutf8e_encoder_string_length(tutf8e_encoder_%s, input, input_length, output_length);
+  return tutf8e_encoder_string_length(tutf8e_encoder_%s, input, input_length, invalid, output_length);
 }
 '''%(name, name))
 
     include.write('''
-static inline int tutf8e_%s_string_encode(const char *input, char *output, size_t *output_length)
+static inline int tutf8e_%s_string_encode(const char *input, char *output, const char *invalid, size_t *output_length)
 {
-  return tutf8e_encoder_string_encode(tutf8e_encoder_%s, input, output, output_length);
+  return tutf8e_encoder_string_encode(tutf8e_encoder_%s, input, invalid, output, output_length);
 }
 '''%(name, name))
 
     include.write('''
-static inline int tutf8e_%s_buffer_length(const char *i, size_t input_length, size_t *length)
+static inline int tutf8e_%s_buffer_length(const char *i, size_t input_length, const char *invalid, size_t *length)
 {
-  return tutf8e_encoder_buffer_length(tutf8e_encoder_%s, input, input_length, length);
+  return tutf8e_encoder_buffer_length(tutf8e_encoder_%s, input, input_length, invalid, length);
 }
 '''%(name, name))
 
     include.write('''
-static inline int tutf8e_%s_buffer_encode(const char *i, size_t input_length, char *output, size_t *output_length)
+static inline int tutf8e_%s_buffer_encode(const char *i, size_t input_length, const char *invalid, char *output, size_t *output_length)
 {
-  return tutf8e_encoder_buffer_encode(tutf8e_encoder_%s, input, input_length, output, output_length);
+  return tutf8e_encoder_buffer_encode(tutf8e_encoder_%s, input, input_length, invalid, output, output_length);
 }
 '''%(name, name))
 
@@ -391,12 +394,14 @@ with open('test/test.c', 'w') as test:
   test.write('#include <stdio.h>\n')
   test.write('#include <string.h>\n')
   test.write('#include <stdlib.h>\n')
+  test.write('#include <memory.h>\n')
   test.write('\n')
   test.write('int main(int argc, char *argv[])\n')
   test.write('{\n')
   test.write('  int pass = 0;\n')
   test.write('  int fail = 0;\n')
   test.write('  int ret;\n')
+  test.write('  char *copy;\n')
   test.write('  size_t input_length, output_length;\n')
   test.write('  char buffer[1024];\n')
   # test.write('  char *encoded;\n')
@@ -419,7 +424,7 @@ with open('test/test.c', 'w') as test:
         test.write('    %s,\n'%(', '.join([ '0x%02x'%(j) for j in data[i:i+24]])))
       test.write('  };\n')
 
-  test.write('\n  /* string encode to UTF8 */\n')
+  test.write('\n  /* string encode to UTF8, error on invalid input */\n')
   for i in tests:
     if i[1] in encodings:
       name = i[1].replace('-', '_').lower()
@@ -434,7 +439,7 @@ with open('test/test.c', 'w') as test:
       test.write('  }\n')
       test.write('\n')
 
-  test.write('\n  /* buffer encode to UTF8 */\n')
+  test.write('\n  /* buffer encode to UTF8, error on invalid input */\n')
   for i in tests:
     if i[1] in encodings:
       name = i[1].replace('-', '_').lower()
@@ -447,6 +452,44 @@ with open('test/test.c', 'w') as test:
       test.write('    printf("Failed to encode %s test\\n");\n'%(i[0]))
       test.write('    fail++;\n')
       test.write('  }\n')
+      test.write('\n')
+
+  test.write('\n  /* string encode to UTF8, first input character invalid -> ? */\n')
+  for i in tests:
+    if i[1] in ['iso-8859-6', 'iso-8859-7', 'iso-8859-11']:
+      name = i[1].replace('-', '_').lower()
+      test.write('  output_length = sizeof(buffer);\n')
+      test.write('  copy = strdup(%s);\n'%(i[0]))
+      test.write('  copy[0] = 255;\n')
+      test.write('  buffer[0] = 255;\n')
+      test.write('  ret = tutf8e_encoder_string_encode(tutf8e_encoder_%s, copy, "?", buffer, &output_length);\n'%(name))
+      test.write('  if (!ret && buffer[0]==\'?\') {\n')
+      test.write('    printf("%s\\n", buffer);\n')
+      test.write('    pass++;\n')
+      test.write('  } else {\n')
+      test.write('    printf("Failed to encode %s test\\n");\n'%(i[0]))
+      test.write('    fail++;\n')
+      test.write('  }\n')
+      test.write('  free(copy);\n')
+      test.write('\n')
+
+  test.write('\n  /* string encode to UTF8, first input character invalid -> [INVALID] */\n')
+  for i in tests:
+    if i[1] in ['iso-8859-6', 'iso-8859-7', 'iso-8859-11']:
+      name = i[1].replace('-', '_').lower()
+      test.write('  output_length = sizeof(buffer);\n')
+      test.write('  copy = strdup(%s);\n'%(i[0]))
+      test.write('  copy[0] = 255;\n')
+      test.write('  buffer[0] = 255;\n')
+      test.write('  ret = tutf8e_encoder_string_encode(tutf8e_encoder_%s, copy, "[INVALID]", buffer, &output_length);\n'%(name))
+      test.write('  if (!ret && !strncmp(buffer, "[INVALID]", 9)) {\n')
+      test.write('    printf("%s\\n", buffer);\n')
+      test.write('    pass++;\n')
+      test.write('  } else {\n')
+      test.write('    printf("Failed to encode %s test\\n");\n'%(i[0]))
+      test.write('    fail++;\n')
+      test.write('  }\n')
+      test.write('  free(copy);\n')
       test.write('\n')
 
   test.write('  printf("%d passed, %d failed tests\\n", pass, fail);\n')

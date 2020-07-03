@@ -3,12 +3,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <memory.h>
 
 int main(int argc, char *argv[])
 {
   int pass = 0;
   int fail = 0;
   int ret;
+  char *copy;
   size_t input_length, output_length;
   char buffer[1024];
 
@@ -166,7 +168,7 @@ int main(int argc, char *argv[])
     0x21, 0x00,
   };
 
-  /* string encode to UTF8 */
+  /* string encode to UTF8, error on invalid input */
   output_length = sizeof(buffer);
   ret = tutf8e_encoder_string_encode(tutf8e_encoder_iso_8859_1, english, NULL, buffer, &output_length);
   if (!ret && !strcmp(buffer, englishUTF8)) {
@@ -288,7 +290,7 @@ int main(int argc, char *argv[])
   }
 
 
-  /* buffer encode to UTF8 */
+  /* buffer encode to UTF8, error on invalid input */
   input_length = strlen(english);
   output_length = sizeof(buffer);
   ret = tutf8e_encoder_buffer_encode(tutf8e_encoder_iso_8859_1, english, input_length, NULL, buffer, &output_length);
@@ -408,6 +410,66 @@ int main(int argc, char *argv[])
     printf("Failed to encode polish test\n");
     fail++;
   }
+
+
+  /* string encode to UTF8, first input character invalid -> ? */
+  output_length = sizeof(buffer);
+  copy = strdup(greek);
+  copy[0] = 255;
+  buffer[0] = 255;
+  ret = tutf8e_encoder_string_encode(tutf8e_encoder_iso_8859_7, copy, "?", buffer, &output_length);
+  if (!ret && buffer[0]=='?') {
+    printf("%s\n", buffer);
+    pass++;
+  } else {
+    printf("Failed to encode greek test\n");
+    fail++;
+  }
+  free(copy);
+
+  output_length = sizeof(buffer);
+  copy = strdup(thai);
+  copy[0] = 255;
+  buffer[0] = 255;
+  ret = tutf8e_encoder_string_encode(tutf8e_encoder_iso_8859_11, copy, "?", buffer, &output_length);
+  if (!ret && buffer[0]=='?') {
+    printf("%s\n", buffer);
+    pass++;
+  } else {
+    printf("Failed to encode thai test\n");
+    fail++;
+  }
+  free(copy);
+
+
+  /* string encode to UTF8, first input character invalid -> [INVALID] */
+  output_length = sizeof(buffer);
+  copy = strdup(greek);
+  copy[0] = 255;
+  buffer[0] = 255;
+  ret = tutf8e_encoder_string_encode(tutf8e_encoder_iso_8859_7, copy, "[INVALID]", buffer, &output_length);
+  if (!ret && !strncmp(buffer, "[INVALID]", 9)) {
+    printf("%s\n", buffer);
+    pass++;
+  } else {
+    printf("Failed to encode greek test\n");
+    fail++;
+  }
+  free(copy);
+
+  output_length = sizeof(buffer);
+  copy = strdup(thai);
+  copy[0] = 255;
+  buffer[0] = 255;
+  ret = tutf8e_encoder_string_encode(tutf8e_encoder_iso_8859_11, copy, "[INVALID]", buffer, &output_length);
+  if (!ret && !strncmp(buffer, "[INVALID]", 9)) {
+    printf("%s\n", buffer);
+    pass++;
+  } else {
+    printf("Failed to encode thai test\n");
+    fail++;
+  }
+  free(copy);
 
   printf("%d passed, %d failed tests\n", pass, fail);
 }
