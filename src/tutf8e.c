@@ -3,7 +3,7 @@
 
 #include <string.h>
 
-int tutf8e_string_length(const uint16_t *table, const char *input, size_t *input_length, size_t *output_length)
+int tutf8e_string_length(const uint16_t *table, const char *input, size_t *input_length, size_t *output_length, size_t *invalid_count)
 {
   const unsigned char *i;
   for (i = (const unsigned char *) input; *i; ++i, (*input_length)++) {
@@ -20,20 +20,27 @@ int tutf8e_string_length(const uint16_t *table, const char *input, size_t *input
       *output_length += 3;
       continue;
     }
-    return TUTF8E_INVALID;
+    if (invalid_count) {
+      *invalid_count += 1;
+    }
+    else {
+      return TUTF8E_INVALID;
+    }
   }
   return TUTF8E_OK;
 }
 
-int tutf8e_string_encode(const uint16_t *table, const char *input, char *output, size_t *output_length)
+int tutf8e_string_encode(const uint16_t *table, const char *input, const char *invalid, char *output, size_t *output_length)
 {
   int ret;
   size_t input_length = 0;
   size_t encoded_length = 0;
-  if (!(ret = tutf8e_string_length(table, input, &input_length, &encoded_length)))
+  size_t invalid_count = 0;
+  size_t invalid_length = invalid ? strlen(invalid) : 0;
+  if (!(ret = tutf8e_string_length(table, input, &input_length, &encoded_length, &invalid_count)))
   {
-    if (encoded_length+1 > *output_length) return TUTF8E_TOOLONG;
-    if (!(ret = tutf8e_buffer_encode(table, input, input_length, output, output_length)))
+    if (encoded_length+invalid_count*invalid_length+1 > *output_length) return TUTF8E_TOOLONG;
+    if (!(ret = tutf8e_buffer_encode(table, input, input_length, invalid, output, output_length)))
     {
       output[encoded_length] = 0;
       return TUTF8E_OK;
@@ -42,7 +49,14 @@ int tutf8e_string_encode(const uint16_t *table, const char *input, char *output,
   return ret;
 }
 
-int tutf8e_buffer_length(const uint16_t *table, const char *input, size_t input_length, size_t *length)
+int tutf8e_buffer_length
+(
+  const uint16_t *table,
+  const char *input,
+  size_t input_length,
+  size_t *length,
+  size_t *invalid_count
+)
 {
   const unsigned char *i;
   for (i = (const unsigned char *) input; input_length; ++i, --input_length) {
@@ -59,16 +73,30 @@ int tutf8e_buffer_length(const uint16_t *table, const char *input, size_t input_
       *length += 3;
       continue;
     }
-    return TUTF8E_INVALID;
+    if (invalid_count) {
+      *invalid_count += 1;
+    }
+    else {
+      return TUTF8E_INVALID;
+    }
   }
   return TUTF8E_OK;
 }
 
-int tutf8e_buffer_encode(const uint16_t *table, const char *input, size_t input_length, char *output, size_t *output_length)
+int tutf8e_buffer_encode
+(
+  const uint16_t *table,
+  const char *input,
+  size_t input_length,
+  const char *invalid,
+  char *output,
+  size_t *output_length
+)
 {
   size_t left = *output_length;
   unsigned char *o = (unsigned char *) output;
   const unsigned char *i;
+  size_t invalid_length = invalid ? strlen(invalid) : 0;
   for (i = (const unsigned char *) input; input_length; ++i, --input_length) {
     const uint16_t c = table[*i];
     if (c<0x80) {
@@ -92,7 +120,18 @@ int tutf8e_buffer_encode(const uint16_t *table, const char *input, size_t input_
       left -= 3;
       continue;
     }
-    return TUTF8E_INVALID;
+    if (invalid)
+    {
+      if (left<invalid_length) return TUTF8E_TOOLONG;
+      if (invalid_length) {
+        memcpy(o, invalid, invalid_length);
+        o += invalid_length;
+        left -= invalid_length;
+      }
+    }
+    else {
+      return TUTF8E_INVALID;
+    }
   }
   *output_length -= left;
   return TUTF8E_OK;
